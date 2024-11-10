@@ -1,9 +1,9 @@
 import { Redis } from '@upstash/redis';
-import { REDIS_TOKEN, REDIS_URL } from '$env/static/private';
+import { UPSTASH_REDIS_REST_TOKEN, UPSTASH_REDIS_REST_URL } from '$env/static/private';
 
 const redisClient = new Redis({
-	url: REDIS_URL,
-	token: REDIS_TOKEN,
+	url: UPSTASH_REDIS_REST_URL,
+	token: UPSTASH_REDIS_REST_TOKEN,
 	agent: 'SnapGram',
 	automaticDeserialization: false,
 	retry: {
