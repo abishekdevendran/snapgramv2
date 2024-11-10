@@ -1,3 +1,7 @@
-import Redis from "ioredis"
+import { Redis } from '@upstash/redis';
+import { REDIS_TOKEN, REDIS_URL } from '$env/static/private';
 
-export const redisClient = new Redis("rediss://default:AWFwAAIjcDFhNjAzMWJjMTdiZjI0Y2JlYjAyYjdkNWZmZGRlMjIxNnAxMA@vast-sheepdog-24944.upstash.io:6379");
+export const redisClient = new Redis({
+  url: REDIS_URL,
+  token: REDIS_TOKEN
+});

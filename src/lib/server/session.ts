@@ -1,9 +1,9 @@
 import { encodeBase32LowerCaseNoPadding, encodeHexLowerCase } from '@oslojs/encoding';
-import { redisClient } from './db/redis';
 import { sha256 } from '@oslojs/crypto/sha2';
 import type { RequestEvent } from '@sveltejs/kit';
 import { db } from './db';
 import { user, type User } from './db/schema';
+import { redisClient } from '$lib/server/db/redis';
 
 export const sessionCookieName = 'auth-session';
 
@@ -28,22 +28,24 @@ export async function createSession(token: string, userId: string): Promise<Sess
 			user_id: session.userId,
 			expires_at: Math.floor(Number(session.expiresAt) / 1000)
 		}),
-		'EX',
-		Math.floor(Number(session.expiresAt) / 1000)
+		{ ex: Math.floor(Number(session.expiresAt) / 1000) }
 	);
 	return session;
 }
 
 export async function validateSessionToken(token: string): Promise<SessionValidationResult> {
 	const sessionId = encodeHexLowerCase(sha256(new TextEncoder().encode(token)));
-	const item = await redisClient.get(`session:${sessionId}`);
-	if (item === null) {
+	const result = (await redisClient.get(`session:${sessionId}`)) as {
+		id: string;
+		user_id: string;
+		expires_at: number;
+	} | null;
+	if (result === null) {
 		return {
 			session: null,
 			user: null
 		};
 	}
-	const result = JSON.parse(item);
 	// get user
 	const user = await db.query.user.findFirst({
 		where: (user, { eq }) => eq(user.id, result.user_id)
@@ -76,8 +78,7 @@ export async function validateSessionToken(token: string): Promise<SessionValida
 				user_id: session.userId,
 				expires_at: Math.floor(Number(session.expiresAt) / 1000)
 			}),
-			'EX',
-			Math.floor(Number(session.expiresAt) / 1000)
+			{ ex: Math.floor(Number(session.expiresAt) / 1000) }
 		);
 	}
 	return { session, user };
