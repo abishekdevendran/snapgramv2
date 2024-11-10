@@ -2,7 +2,7 @@ import { encodeBase32LowerCaseNoPadding, encodeHexLowerCase } from '@oslojs/enco
 import { sha256 } from '@oslojs/crypto/sha2';
 import type { RequestEvent } from '@sveltejs/kit';
 import { db } from './db';
-import { user, type User } from './db/schema';
+import { type User } from './db/schema';
 import { redisClient } from '$lib/server/db/redis';
 
 export const sessionCookieName = 'auth-session';
