@@ -35,6 +35,7 @@ export async function GET(event: RequestEvent): Promise<Response> {
 	try {
 		tokens = await github.validateAuthorizationCode(code);
 	} catch (e) {
+		console.error('GHUB err: ', e);
 		// Invalid code or client credentials
 		return new Response(null, {
 			status: 400
