@@ -65,6 +65,7 @@ export async function GET(event: RequestEvent): Promise<Response> {
 	});
 
 	if (existingUser) {
+		console.log('existingUser: ', existingUser);
 		const sessionToken = generateSessionToken();
 		const session = await createSession(sessionToken, existingUser.id);
 		setSessionTokenCookie(event, sessionToken, session.expiresAt);
@@ -75,6 +76,8 @@ export async function GET(event: RequestEvent): Promise<Response> {
 			}
 		});
 	}
+
+	console.log('new user: ', githubUser);
 
 	// TODO: Replace this with your own DB query.
 	// const user = await createUser(githubUserId, githubUsername);
@@ -89,10 +92,13 @@ export async function GET(event: RequestEvent): Promise<Response> {
 		bio: 'Hi, I am new on SnapGram!'
 	});
 
+	console.log('inserted user: ', userVal);
+
 	const sessionToken = generateSessionToken();
 	const session = await createSession(sessionToken, userId);
+	console.log('session: ', session);
 	setSessionTokenCookie(event, sessionToken, session.expiresAt);
-
+	console.log('set cookie');
 	return new Response(null, {
 		status: 302,
 		headers: {
