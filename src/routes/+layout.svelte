@@ -15,10 +15,12 @@
 	);
 </script>
 
-<ModeWatcher />
-<Toaster />
-<NavBar />
 <svelte:head>
 	<title>{title}</title>
 </svelte:head>
-{@render children()}
+<ModeWatcher />
+<Toaster />
+<main class="min-h-screen flex min-h-screen w-full flex-col bg-muted/40">
+	<NavBar />
+	{@render children()}
+</main>
