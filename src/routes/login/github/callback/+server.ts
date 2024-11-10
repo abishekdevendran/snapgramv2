@@ -19,7 +19,6 @@ export async function GET(event: RequestEvent): Promise<Response> {
 	const code = event.url.searchParams.get('code');
 	const state = event.url.searchParams.get('state');
 	const storedState = event.cookies.get('github_oauth_state') ?? null;
-	console.log(code, state, storedState);
 	if (code === null || state === null || storedState === null) {
 		return new Response(null, {
 			status: 400
@@ -35,7 +34,6 @@ export async function GET(event: RequestEvent): Promise<Response> {
 	try {
 		tokens = await github.validateAuthorizationCode(code);
 	} catch (e) {
-		console.error('GHUB err: ', e);
 		// Invalid code or client credentials
 		return new Response(null, {
 			status: 400
@@ -47,8 +45,17 @@ export async function GET(event: RequestEvent): Promise<Response> {
 			Authorization: `Bearer ${tokens.accessToken()}`
 		}
 	});
-	console.log('githubUserResponse: ', JSON.stringify(githubUserResponse));
-	const githubUser = await githubUserResponse.json();
+    let githubUser;
+	try {
+		githubUser = await githubUserResponse.json();
+	} catch (e) {
+		console.error('GHUB err: ', e);
+        // print full response
+        console.log('GHUB err: ', (await githubUserResponse.text()));
+		return new Response(null, {
+			status: 400
+		});
+	}
 	const githubUserId = githubUser.id;
 	const githubUsername = githubUser.login;
 
