@@ -42,17 +42,16 @@ export async function GET(event: RequestEvent): Promise<Response> {
 	console.log('tokens: ', JSON.stringify(tokens));
 	const githubUserResponse = await fetch('https://api.github.com/user', {
 		headers: {
-			Authorization: `Bearer ${tokens.accessToken()}`
+			Authorization: `Bearer ${tokens.accessToken()}`,
+			'User-Agent': 'SnapGram'
 		}
 	});
-    let githubUser;
+	let githubUser;
 	let githubUserResponseClone = githubUserResponse.clone();
 	try {
 		githubUser = await githubUserResponse.json();
 	} catch (e) {
-		console.error('GHUB err: ', e);
-		// print full response
-		console.log('GHUB err: ', (await githubUserResponseClone.text()));
+		console.log('GHUB err: ', await githubUserResponseClone.text());
 		return new Response(null, {
 			status: 400
 		});
