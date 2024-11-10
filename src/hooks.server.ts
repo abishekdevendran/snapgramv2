@@ -4,8 +4,6 @@ import { encodeBase32LowerCase } from '@oslojs/encoding';
 
 const DAY_IN_MS = 1000 * 60 * 60 * 24;
 
-export const sessionCookieName = 'auth-session';
-
 export function generateSessionToken() {
 	const bytes = crypto.getRandomValues(new Uint8Array(20));
 	const token = encodeBase32LowerCase(bytes);
@@ -13,7 +11,7 @@ export function generateSessionToken() {
 }
 
 const handleAuth: Handle = async ({ event, resolve }) => {
-	const sessionToken = event.cookies.get(sessionCookieName);
+	const sessionToken = event.cookies.get(auth.sessionCookieName);
 	if (!sessionToken) {
 		event.locals.user = null;
 		event.locals.session = null;
