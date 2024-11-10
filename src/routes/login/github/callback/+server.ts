@@ -46,12 +46,13 @@ export async function GET(event: RequestEvent): Promise<Response> {
 		}
 	});
     let githubUser;
+	let githubUserResponseClone = githubUserResponse.clone();
 	try {
 		githubUser = await githubUserResponse.json();
 	} catch (e) {
 		console.error('GHUB err: ', e);
-        // print full response
-        console.log('GHUB err: ', (await githubUserResponse.text()));
+		// print full response
+		console.log('GHUB err: ', (await githubUserResponseClone.text()));
 		return new Response(null, {
 			status: 400
 		});
