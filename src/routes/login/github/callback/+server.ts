@@ -41,11 +41,13 @@ export async function GET(event: RequestEvent): Promise<Response> {
 			status: 400
 		});
 	}
+	console.log('tokens: ', tokens);
 	const githubUserResponse = await fetch('https://api.github.com/user', {
 		headers: {
 			Authorization: `Bearer ${tokens.accessToken()}`
 		}
 	});
+	console.log('githubUserResponse: ', githubUserResponse);
 	const githubUser = await githubUserResponse.json();
 	const githubUserId = githubUser.id;
 	const githubUsername = githubUser.login;
