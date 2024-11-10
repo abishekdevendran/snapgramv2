@@ -1,6 +1,6 @@
 <script lang="ts">
-	import { page } from '$app/stores';
-	import Logout from './Logout.svelte';
+	import LightSwitch from '$lib/components/LightSwitch.svelte';
+	import User from '$lib/components/User.svelte';
 </script>
 
 <header
@@ -9,12 +9,8 @@
 	<div class="container flex h-14 max-w-screen-2xl items-center">
 		<div class="mr-4 hidden md:flex"></div>
 		<div class="flex flex-1 items-center justify-between space-x-2 md:justify-end">
-			{JSON.stringify($page.data)}
-			{#if $page.data.user}
-				<Logout />
-			{:else if $page.url.pathname !== '/login'}
-				<a href="/login">Login</a>
-			{/if}
+			<User />
+			<LightSwitch />
 		</div>
 	</div>
 </header>
