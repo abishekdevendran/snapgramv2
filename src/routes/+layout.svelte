@@ -20,7 +20,7 @@
 </svelte:head>
 <ModeWatcher />
 <Toaster />
-<main class="min-h-screen flex min-h-screen w-full flex-col bg-muted/40">
+<main class="h-[100svh] flex w-full flex-col bg-muted/40">
 	<NavBar />
 	{@render children()}
 </main>
