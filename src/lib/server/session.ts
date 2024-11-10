@@ -21,6 +21,9 @@ export async function createSession(token: string, userId: string): Promise<Sess
 		userId,
 		expiresAt: new Date(Date.now() + 1000 * 60 * 60 * 24 * 30)
 	};
+	if (!redisClient) {
+		throw new Error('Redis client is not available');
+	}
 	await redisClient.set(
 		`session:${session.id}`,
 		JSON.stringify({
@@ -35,11 +38,14 @@ export async function createSession(token: string, userId: string): Promise<Sess
 
 export async function validateSessionToken(token: string): Promise<SessionValidationResult> {
 	const sessionId = encodeHexLowerCase(sha256(new TextEncoder().encode(token)));
-	const result = (await redisClient.get(`session:${sessionId}`)) as {
-		id: string;
-		user_id: string;
-		expires_at: number;
-	} | null;
+	const resp = (await redisClient.get(`session:${sessionId}`)) as string | null;
+	const result = resp
+		? (JSON.parse(resp) as {
+				id: string;
+				user_id: string;
+				expires_at: number;
+			})
+		: null;
 	if (result === null) {
 		return {
 			session: null,
