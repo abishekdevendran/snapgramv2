@@ -1,11 +1,11 @@
 // routes/login/github/callback/+server.ts
-import { generateSessionToken, createSession, setSessionTokenCookie } from '$lib/server/session';
+import { generateSessionToken, createSession, setSessionTokenCookie } from '$lib/server/auth';
 import { github } from '$lib/server/github_oauth';
 
 import type { RequestEvent } from '@sveltejs/kit';
 import type { OAuth2Tokens } from 'arctic';
 import { db } from '$lib/server/db';
-import { user } from '$lib/server/db/schema';
+import { users } from '$lib/server/db/schema';
 import { encodeBase64url } from '@oslojs/encoding';
 
 function generateUserId() {
@@ -40,7 +40,7 @@ export async function GET(event: RequestEvent): Promise<Response> {
 		});
 	}
 	console.log('tokens: ', JSON.stringify(tokens));
-	const githubUserResponse = await fetch('https://api.github.com/user', {
+	const githubUserResponse = await fetch('https://api.github.com/users', {
 		headers: {
 			Authorization: `Bearer ${tokens.accessToken()}`,
 			'User-Agent': 'SnapGram'
@@ -57,7 +57,7 @@ export async function GET(event: RequestEvent): Promise<Response> {
 		});
 	}
 	if (!githubUser.email) {
-		const githubUserEmailResponse = await fetch('https://api.github.com/user/emails', {
+		const githubUserEmailResponse = await fetch('https://api.github.com/users/emails', {
 			headers: {
 				Authorization: `Bearer ${tokens.accessToken()}`,
 				'User-Agent': 'SnapGram',
@@ -75,13 +75,15 @@ export async function GET(event: RequestEvent): Promise<Response> {
 				status: 400
 			});
 		}
-		githubUser.email = githubUserEmail.find((email: { primary: boolean; email: string }) => email.primary)?.email;
+		githubUser.email = githubUserEmail.find(
+			(email: { primary: boolean; email: string }) => email.primary
+		)?.email;
 	}
 	const githubUserId = githubUser.id;
 	const githubUsername = githubUser.login;
 
 	// TODO: Replace this with your own DB query.
-	const existingUser = await db.query.user.findFirst({
+	const existingUser = await db.query.users.findFirst({
 		where: (users, { eq }) => eq(users.githubId, githubUserId)
 	});
 
@@ -99,7 +101,7 @@ export async function GET(event: RequestEvent): Promise<Response> {
 	}
 
 	// check if email is already in use
-	const existingEmail = await db.query.user.findFirst({
+	const existingEmail = await db.query.users.findFirst({
 		where: (users, { eq }) => eq(users.email, githubUser.email)
 	});
 
@@ -113,9 +115,9 @@ export async function GET(event: RequestEvent): Promise<Response> {
 	}
 
 	// TODO: Replace this with your own DB query.
-	// const user = await createUser(githubUserId, githubUsername);
+	// const users = await createUser(githubUserId, githubUsername);
 	const userId = generateUserId();
-	const userVal = await db.insert(user).values({
+	const userVal = await db.insert(users).values({
 		githubId: githubUserId,
 		username: githubUsername,
 		createdAt: new Date(),
@@ -125,7 +127,7 @@ export async function GET(event: RequestEvent): Promise<Response> {
 		bio: 'Hi, I am new on SnapGram!'
 	});
 
-	console.log('inserted user: ', userVal);
+	console.log('inserted users: ', userVal);
 
 	const sessionToken = generateSessionToken();
 	const session = await createSession(sessionToken, userId);

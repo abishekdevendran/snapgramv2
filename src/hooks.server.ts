@@ -1,5 +1,5 @@
 import type { Handle } from '@sveltejs/kit';
-import * as auth from '$lib/server/session';
+import * as auth from '$lib/server/auth';
 import { encodeBase32LowerCase } from '@oslojs/encoding';
 
 const DAY_IN_MS = 1000 * 60 * 60 * 24;
