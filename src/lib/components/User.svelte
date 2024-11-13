@@ -12,7 +12,7 @@
 			<Avatar.Root class="hover:bg-primary/90">
 				<Avatar.Image
 					class="hover:opacity-80"
-					src={$page.data.user.avatar}
+					src={$page.data.user.profilePictureUrl}
 					alt={$page.data.user.username}
 				/>
 				<Avatar.Fallback class="hover:opacity-80"
