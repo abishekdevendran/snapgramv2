@@ -56,6 +56,27 @@ export async function GET(event: RequestEvent): Promise<Response> {
 			status: 400
 		});
 	}
+	if (!githubUser.email) {
+		const githubUserEmailResponse = await fetch('https://api.github.com/user/emails', {
+			headers: {
+				Authorization: `Bearer ${tokens.accessToken()}`,
+				'User-Agent': 'SnapGram',
+				Accept: 'application/vnd.github+json'
+			}
+		});
+		let githubUserEmail;
+		let githubUserEmailResponseClone = githubUserEmailResponse.clone();
+		try {
+			githubUserEmail = await githubUserEmailResponse.json();
+			console.log('githubUserEmail: ', githubUserEmail);
+		} catch (e) {
+			console.log('GHUB err: ', await githubUserEmailResponseClone.text());
+			return new Response(null, {
+				status: 400
+			});
+		}
+		githubUser.email = githubUserEmail.find((email: { primary: boolean; email: string }) => email.primary)?.email;
+	}
 	const githubUserId = githubUser.id;
 	const githubUsername = githubUser.login;
 
@@ -77,7 +98,19 @@ export async function GET(event: RequestEvent): Promise<Response> {
 		});
 	}
 
-	console.log('new user: ', githubUser);
+	// check if email is already in use
+	const existingEmail = await db.query.user.findFirst({
+		where: (users, { eq }) => eq(users.email, githubUser.email)
+	});
+
+	if (existingEmail) {
+		return new Response(null, {
+			status: 302,
+			headers: {
+				Location: '/login?error=Email already in use'
+			}
+		});
+	}
 
 	// TODO: Replace this with your own DB query.
 	// const user = await createUser(githubUserId, githubUsername);

@@ -19,8 +19,8 @@
 	<title>{title}</title>
 </svelte:head>
 <ModeWatcher />
-<Toaster />
-<main class="h-[100svh] flex w-full flex-col bg-muted/40">
+<Toaster richColors />
+<main class="flex h-[100svh] w-full flex-col bg-muted/40">
 	<NavBar />
 	{@render children()}
 </main>
