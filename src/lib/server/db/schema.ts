@@ -100,43 +100,76 @@ export const notifications = pgTable('notifications', {
 });
 
 // Relations
-export const userRelations = relations(users, ({ many, one }) => ({
+export const userRelations = relations(users, ({ many }) => ({
 	posts: many(posts),
 	likes: many(likes),
 	comments: many(comments),
-	followers: many(followers),
+	followers: many(followers, {
+		relationName: 'follower'
+	}),
 	notifications: many(notifications),
-	following: many(followers),
+	following: many(followers, {
+		relationName: 'followingUser'
+	})
 }));
 
 export const postRelations = relations(posts, ({ many, one }) => ({
-	user: one(users),
+	user: one(users, {
+		fields: [posts.userId],
+		references: [users.id]
+	}),
 	images: many(images),
 	likes: many(likes),
-	comments: many(comments),
+	comments: many(comments)
 }));
 
-export const imageRelations = relations(images, ({ many, one }) => ({
-	post: one(posts),
+export const imageRelations = relations(images, ({ one }) => ({
+	post: one(posts, {
+		fields: [images.postId],
+		references: [posts.id]
+	})
 }));
 
-export const likeRelations = relations(likes, ({ many, one }) => ({
-	user: one(users),
-	post: one(posts),
+export const likeRelations = relations(likes, ({ one }) => ({
+	user: one(users, {
+		fields: [likes.userId],
+		references: [users.id]
+	}),
+	post: one(posts, {
+		fields: [likes.postId],
+		references: [posts.id]
+	})
 }));
 
-export const commentRelations = relations(comments, ({ many, one }) => ({
-	user: one(users),
-	post: one(posts),
+export const commentRelations = relations(comments, ({ one }) => ({
+	user: one(users, {
+		fields: [comments.userId],
+		references: [users.id]
+	}),
+	post: one(posts, {
+		fields: [comments.postId],
+		references: [posts.id]
+	})
 }));
 
-export const followerRelations = relations(followers, ({ many, one }) => ({
-	user: one(users),
-	followingUser: one(users),
+export const followerRelations = relations(followers, ({ one }) => ({
+	user: one(users, {
+		fields: [followers.userId],
+		references: [users.id],
+		relationName: 'follower'
+	}),
+	followingUser: one(users, {
+		fields: [followers.followingUserId],
+		references: [users.id],
+		relationName: 'followingUser'
+	})
 }));
 
-export const notificationRelations = relations(notifications, ({ many, one }) => ({
-	user: one(users),
+export const notificationRelations = relations(notifications, ({ one }) => ({
+	user: one(users, {
+		fields: [notifications.userId],
+		references: [users.id]
+	})
 }));
 
 // Types for each table
