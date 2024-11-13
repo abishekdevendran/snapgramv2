@@ -56,7 +56,6 @@ export async function GET(event: RequestEvent): Promise<Response> {
 			status: 400
 		});
 	}
-	console.log('githubUser: ', githubUser);
 	if (!githubUser.email) {
 		const githubUserEmailResponse = await fetch('https://api.github.com/users/emails', {
 			headers: {
@@ -69,7 +68,6 @@ export async function GET(event: RequestEvent): Promise<Response> {
 		let githubUserEmailResponseClone = githubUserEmailResponse.clone();
 		try {
 			githubUserEmail = await githubUserEmailResponse.json();
-			console.log('githubUserEmail: ', githubUserEmail);
 		} catch (e) {
 			console.log('GHUB err: ', await githubUserEmailResponseClone.text());
 			return new Response(null, {
