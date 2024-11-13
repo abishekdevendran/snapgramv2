@@ -1,79 +1,76 @@
 <script lang="ts">
-	import { Button } from "$lib/components/ui/button";
-	import { Avatar, AvatarImage, AvatarFallback } from "$lib/components/ui/avatar";
-	import { Tabs, TabsList, TabsTrigger, TabsContent } from "$lib/components/ui/tabs";
-	import { CircleAlert, Camera, Settings } from "lucide-svelte";;
+	import { Button } from '$lib/components/ui/button';
+	import { Avatar, AvatarImage, AvatarFallback } from '$lib/components/ui/avatar';
+	import { Tabs, TabsList, TabsTrigger, TabsContent } from '$lib/components/ui/tabs';
+	import { CircleAlert, Camera, Settings } from 'lucide-svelte';
+	import type { PageData } from './$types';
 
-	let username = $state("johndoe");
-	let fullName = $state("John Doe");
-	let bio = $state("Photography enthusiast | Travel lover | Coffee addict");
-	let postCount = $state(42);
-	let followerCount = $state(1234);
-	let followingCount = $state(567);
+	let { data }: { data: PageData } = $props();
+	console.log(data);
 
 	let posts = $state([
-		{ id: 1, imageUrl: "/images/placeholder.png" },
-		{ id: 2, imageUrl: "/images/placeholder.png" },
-		{ id: 3, imageUrl: "/images/placeholder.png" },
-		{ id: 4, imageUrl: "/images/placeholder.png" },
-		{ id: 5, imageUrl: "/images/placeholder.png" },
-		{ id: 6, imageUrl: "/images/placeholder.png" },
+		{ id: 1, imageUrl: '/images/placeholder.png' },
+		{ id: 2, imageUrl: '/images/placeholder.png' },
+		{ id: 3, imageUrl: '/images/placeholder.png' },
+		{ id: 4, imageUrl: '/images/placeholder.png' },
+		{ id: 5, imageUrl: '/images/placeholder.png' },
+		{ id: 6, imageUrl: '/images/placeholder.png' }
 	]);
 </script>
 
 <div class="container mx-auto px-4 py-8">
-	<div class="flex flex-col md:flex-row items-center md:items-start mb-8">
-		<Avatar class="w-24 h-24 md:w-32 md:h-32">
-			<AvatarImage src="/images/user.png" alt={username} />
-			<AvatarFallback>{username[0].toUpperCase()}</AvatarFallback>
+	<div class="mb-8 flex flex-col items-center md:flex-row md:items-start">
+		<Avatar class="h-24 w-24 md:h-32 md:w-32">
+			<AvatarImage src={data.user?.profilePictureUrl} alt={'John Doe'} />
+			<AvatarFallback>{data.user?.username.toUpperCase() ?? 'JD'}</AvatarFallback>
 		</Avatar>
-		<div class="md:ml-8 mt-4 md:mt-0">
-			<div class="flex items-center mb-4">
-				<h1 class="text-2xl font-bold mr-4">{username}</h1>
+		<div class="mt-4 md:ml-8 md:mt-0">
+			<div class="mb-4 flex items-center">
+				<h1 class="mr-4 text-2xl font-bold">{data.user?.username ?? 'John Doe'}</h1>
 				<Button variant="outline" class="mr-2">Edit Profile</Button>
 				<Button variant="ghost" size="icon">
 					<Settings class="h-4 w-4" />
 				</Button>
 			</div>
-			<div class="flex mb-4">
+			<div class="mb-4 flex">
 				<span class="mr-6">
-					<strong>{postCount}</strong>
-					 posts
+					<strong>{data.user?.posts.length ?? 0}</strong>
+					posts
 				</span>
 				<span class="mr-6">
-					<strong>{followerCount}</strong>
-					 followers
+					<strong>{data?.user?.followers.length ?? 0}</strong>
+					followers
 				</span>
 				<span>
-					<strong>{followingCount}</strong>
-					 following
+					<strong>{data?.user?.following.length ?? 0}</strong>
+					following
 				</span>
 			</div>
 			<div>
-				<h2 class="font-bold">{fullName}</h2>
-				<p>{bio}</p>
+				<h2 class="font-bold">{data.user?.username ?? 'battletitan'}</h2>
+				<p>{data?.user?.bio ?? `Hi, I'm New to SnapGram`}</p>
 			</div>
 		</div>
 	</div>
 
 	<Tabs value="posts" class="w-full">
 		<TabsList class="grid w-full grid-cols-3">
-			<TabsTrigger value="posts"><CircleAlert class="h-4 w-4 mr-2" /> Posts</TabsTrigger>
-			<TabsTrigger value="reels"><Camera class="h-4 w-4 mr-2" /> Reels</TabsTrigger>
-			<TabsTrigger value="tagged"><Avatar class="h-4 w-4 mr-2" /> Tagged</TabsTrigger>
+			<TabsTrigger value="posts"><CircleAlert class="mr-2 h-4 w-4" /> Posts</TabsTrigger>
+			<TabsTrigger value="reels"><Camera class="mr-2 h-4 w-4" /> Reels</TabsTrigger>
+			<TabsTrigger value="tagged"><Avatar class="mr-2 h-4 w-4" /> Tagged</TabsTrigger>
 		</TabsList>
 		<TabsContent value="posts">
 			<div class="grid grid-cols-3 gap-1">
-				{#each posts as post (post.id)}
-					<img src={post.imageUrl} alt="Post {post.id}" class="w-full aspect-square object-cover" />
+				{#each data?.user?.posts ?? [] as post (post.id)}
+					<img src={post.images[0].url} alt="Post {post.id}" class="aspect-square w-full object-cover" />
 				{/each}
 			</div>
 		</TabsContent>
 		<TabsContent value="reels">
-			<p class="text-center py-8">No reels to show</p>
+			<p class="py-8 text-center">No reels to show</p>
 		</TabsContent>
 		<TabsContent value="tagged">
-			<p class="text-center py-8">No tagged posts</p>
+			<p class="py-8 text-center">No tagged posts</p>
 		</TabsContent>
 	</Tabs>
 </div>

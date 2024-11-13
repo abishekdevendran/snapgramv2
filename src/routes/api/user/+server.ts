@@ -74,7 +74,5 @@ export const GET = async (event) => {
 		}
 	});
 
-	console.log('USER: ', user);
-
 	return json(user);
 };
