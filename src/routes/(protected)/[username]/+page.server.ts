@@ -1,4 +1,5 @@
 import { db } from '$lib/server/db/index.js';
+import { redirect } from '@sveltejs/kit';
 
 export const load = async (event) => {
 	if (!event.locals.user) {
@@ -74,5 +75,7 @@ export const load = async (event) => {
 			}
 		});
 		return { user };
+	} else {
+		return redirect(301, '/dashboard?error=Unauthorized');
 	}
 };

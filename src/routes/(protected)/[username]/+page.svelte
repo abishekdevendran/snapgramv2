@@ -34,15 +34,15 @@
 			</div>
 			<div class="mb-4 flex">
 				<span class="mr-6">
-					<strong>{data.user?.posts.length ?? 0}</strong>
+					<strong>{data.user?.posts?.length ?? 0}</strong>
 					posts
 				</span>
 				<span class="mr-6">
-					<strong>{data?.user?.followers.length ?? 0}</strong>
+					<strong>{data?.user?.followers?.length ?? 0}</strong>
 					followers
 				</span>
 				<span>
-					<strong>{data?.user?.following.length ?? 0}</strong>
+					<strong>{data?.user?.following?.length ?? 0}</strong>
 					following
 				</span>
 			</div>
@@ -61,9 +61,17 @@
 		</TabsList>
 		<TabsContent value="posts">
 			<div class="grid grid-cols-3 gap-1">
-				{#each data?.user?.posts ?? [] as post (post.id)}
-					<img src={post.images[0].url} alt="Post {post.id}" class="aspect-square w-full object-cover" />
-				{/each}
+				{#if data?.user?.posts?.length === 0}
+					<p class="col-span-3 py-8 text-center">No posts to show</p>
+				{:else}
+					{#each data?.user?.posts ?? [] as post (post.id)}
+						<img
+							src={post.images[0].url}
+							alt="Post {post.id}"
+							class="aspect-square w-full object-cover"
+						/>
+					{/each}
+				{/if}
 			</div>
 		</TabsContent>
 		<TabsContent value="reels">
