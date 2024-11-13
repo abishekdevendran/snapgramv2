@@ -40,7 +40,7 @@ export async function GET(event: RequestEvent): Promise<Response> {
 		});
 	}
 	console.log('tokens: ', JSON.stringify(tokens));
-	const githubUserResponse = await fetch('https://api.github.com/users', {
+	const githubUserResponse = await fetch('https://api.github.com/user', {
 		headers: {
 			Authorization: `Bearer ${tokens.accessToken()}`,
 			'User-Agent': 'SnapGram'
@@ -56,6 +56,7 @@ export async function GET(event: RequestEvent): Promise<Response> {
 			status: 400
 		});
 	}
+	console.log('githubUser: ', githubUser);
 	if (!githubUser.email) {
 		const githubUserEmailResponse = await fetch('https://api.github.com/users/emails', {
 			headers: {
