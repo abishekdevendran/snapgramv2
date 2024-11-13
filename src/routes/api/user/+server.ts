@@ -11,17 +11,39 @@ export const GET = async (event) => {
 	const user = await db.query.users.findFirst({
 		where: (user, { eq }) => eq(user.id, event.locals.user!.id),
 		with: {
-			notifications: true,
+			notifications: {
+				with: {
+					user: {
+						columns: {
+							id: true,
+							username: true,
+							profilePictureUrl: true
+						}
+					}
+				}
+			},
 			posts: {
 				with: {
 					comments: {
 						with: {
-							user: true
+							user: {
+								columns: {
+									id: true,
+									username: true,
+									profilePictureUrl: true
+								}
+							}
 						}
 					},
 					likes: {
 						with: {
-							user: true
+							user: {
+								columns: {
+									id: true,
+									username: true,
+									profilePictureUrl: true
+								}
+							}
 						}
 					},
 					images: true
@@ -29,12 +51,24 @@ export const GET = async (event) => {
 			},
 			followers: {
 				with: {
-					user: true
+					followingUser: {
+						columns: {
+							id: true,
+							username: true,
+							profilePictureUrl: true
+						}
+					}
 				}
 			},
 			following: {
 				with: {
-					followingUser: true
+					user: {
+						columns: {
+							id: true,
+							username: true,
+							profilePictureUrl: true
+						}
+					}
 				}
 			}
 		}
