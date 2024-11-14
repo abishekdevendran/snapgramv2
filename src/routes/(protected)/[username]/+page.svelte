@@ -4,6 +4,8 @@
 	import { Tabs, TabsList, TabsTrigger, TabsContent } from '$lib/components/ui/tabs';
 	import { CircleAlert, Camera, Settings } from 'lucide-svelte';
 	import type { PageData } from './$types';
+	import { Image } from '@unpic/svelte';
+	import { blurhashToCssGradientString } from '@unpic/placeholder';
 
 	let { data }: { data: PageData } = $props();
 	console.log(data);
@@ -71,10 +73,14 @@
 					<p class="col-span-3 py-8 text-center">No posts to show</p>
 				{:else}
 					{#each data?.user?.posts ?? [] as post (post.id)}
-						<img
+						<Image
+							layout="fullWidth"
 							src={post.images[0].url}
 							alt="Post {post.id}"
 							class="aspect-square w-full object-cover"
+							background={post.images[0]?.blurhash
+								? blurhashToCssGradientString(post.images[0].blurhash)
+								: undefined}
 						/>
 					{/each}
 				{/if}

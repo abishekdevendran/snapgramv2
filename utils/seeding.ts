@@ -4,6 +4,8 @@ import * as schema from '../src/lib/server/db/schema';
 import 'dotenv/config';
 import { faker } from '@faker-js/faker';
 import { encodeBase64url } from '@oslojs/encoding';
+import { encode } from 'blurhash';
+import { getPixels } from '@unpic/pixels';
 
 if (!process.env.DATABASE_URL) throw new Error('DATABASE_URL is not set');
 
@@ -23,12 +25,21 @@ const generatePost = (userId: string) => ({
 });
 
 // Function to generate random image
-const generateImage = (postId: number) => ({
-	postId,
-	url: faker.image.url(),
-	width: faker.number.int({ min: 100, max: 1000 }),
-	height: faker.number.int({ min: 100, max: 1000 })
-});
+const generateImage = async (postId: number, idx: number) => {
+	const imgUrl = faker.image.url();
+	const imgData = await getPixels(imgUrl);
+	const data = Uint8ClampedArray.from(imgData.data);
+	const blurhash = encode(data, imgData.width, imgData.height, 4, 4);
+	return {
+		postId,
+		url: imgUrl,
+		width: faker.number.int({ min: 100, max: 1000 }),
+		height: faker.number.int({ min: 100, max: 1000 }),
+		idx,
+		caption: faker.helpers.maybe(() => faker.lorem.sentence(), { probability: 0.5 }),
+		blurhash
+	};
+};
 
 // Function to generate random like
 const generateLike = (postId: number, userId: string) => ({
@@ -80,11 +91,12 @@ const generateUser = async (userId?: string) => {
 		where: (post, { eq }) => eq(post.userId, userId)
 	});
 	const postIds = generatedPosts.map((post) => post.id);
-	const images = postIds.flatMap((postId) =>
+	const imagesPromises = postIds.flatMap((postId) =>
 		Array(2)
 			.fill(null)
-			.map(() => generateImage(postId))
+			.map((el, idx) => generateImage(postId, idx))
 	);
+	const images = await Promise.all(imagesPromises);
 	await db.insert(schema.images).values(images).execute();
 };
 

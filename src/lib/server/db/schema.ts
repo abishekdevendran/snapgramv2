@@ -41,7 +41,9 @@ export const images = pgTable('images', {
 	url: text('url').notNull(), // URL of the image in Cloudflare R2 or other storage
 	width: integer('width'), // Width of the image
 	height: integer('height'), // Height of the image
-	isThumbnail: boolean('is_thumbnail').default(false), // Flag for thumbnail images
+	idx: integer('idx').notNull(), // Index of the image in the post
+	blurhash: text('blurhash'), // Blurhash of the image
+	caption: text('caption'), // Optional caption for the image
 	createdAt: timestamp('created_at', { withTimezone: true, mode: 'date' }).defaultNow()
 });
 
