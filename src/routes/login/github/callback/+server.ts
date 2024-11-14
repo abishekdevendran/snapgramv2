@@ -56,6 +56,7 @@ export async function GET(event: RequestEvent): Promise<Response> {
 			status: 400
 		});
 	}
+	console.log('githubUser: ', githubUser);
 	if (!githubUser.email) {
 		const githubUserEmailResponse = await fetch('https://api.github.com/users/emails', {
 			headers: {
@@ -123,7 +124,8 @@ export async function GET(event: RequestEvent): Promise<Response> {
 		profilePictureUrl: githubUser.avatar_url,
 		email: githubUser.email,
 		id: userId,
-		bio: 'Hi, I am new on SnapGram!'
+		bio: 'Hi, I am new on SnapGram!',
+		name: githubUser.name ?? 'John Doe'
 	});
 
 	console.log('inserted users: ', userVal);

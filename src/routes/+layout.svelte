@@ -4,6 +4,8 @@
 	import NavBar from '$lib/components/NavBar.svelte';
 	import { Toaster } from '$lib/components/ui/sonner';
 	import { ModeWatcher } from 'mode-watcher';
+	import { ProgressBar } from '@prgm/sveltekit-progress-bar';
+
 	let { children } = $props();
 
 	const APP_NAME = 'SnapGram';
@@ -20,6 +22,7 @@
 </svelte:head>
 <ModeWatcher />
 <Toaster richColors />
+<ProgressBar class="text-primary" zIndex={999} />
 <main class="flex h-[100svh] w-full flex-col bg-muted/40">
 	<NavBar />
 	{@render children()}

@@ -22,11 +22,17 @@
 	<div class="mb-8 flex flex-col items-center md:flex-row md:items-start">
 		<Avatar class="h-24 w-24 md:h-32 md:w-32">
 			<AvatarImage src={data.user?.profilePictureUrl} alt={'John Doe'} />
-			<AvatarFallback>{data.user?.username.toUpperCase() ?? 'JD'}</AvatarFallback>
+			<AvatarFallback
+				>{data.user?.name
+					?.split(' ')
+					.map((el) => el.at(0))
+					.join('')
+					.toUpperCase() ?? 'JD'}</AvatarFallback
+			>
 		</Avatar>
 		<div class="mt-4 md:ml-8 md:mt-0">
 			<div class="mb-4 flex items-center">
-				<h1 class="mr-4 text-2xl font-bold">{data.user?.username ?? 'John Doe'}</h1>
+				<h1 class="mr-4 text-2xl font-bold">{data.user?.name ?? 'John Doe'}</h1>
 				<Button variant="outline" class="mr-2">Edit Profile</Button>
 				<Button variant="ghost" size="icon">
 					<Settings class="h-4 w-4" />

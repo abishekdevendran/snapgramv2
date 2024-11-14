@@ -46,7 +46,6 @@ export const GET = async (event) => {
 							}
 						}
 					},
-					images: true
 				}
 			},
 			followers: {

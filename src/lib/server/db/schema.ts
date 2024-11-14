@@ -14,6 +14,7 @@ export const users = pgTable('users', {
 	id: text('id').primaryKey(),
 	githubId: integer('github_id'),
 	googleId: text('google_id'),
+	name: text('name').default('John Doe'), // Default name for new users
 	username: text('username').notNull(),
 	email: text('email').notNull().unique(), // Unique email for each user
 	createdAt: timestamp('created_at', { withTimezone: true, mode: 'date' }).defaultNow(), // Account creation date

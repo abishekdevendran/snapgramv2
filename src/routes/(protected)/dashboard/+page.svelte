@@ -1,23 +1,26 @@
 <script lang="ts">
+	import { goto, replaceState } from '$app/navigation';
 	import { Package2 } from 'lucide-svelte';
 	import { onMount } from 'svelte';
 	import { toast } from 'svelte-sonner';
+	import { page } from '$app/stores';
 	// on mount, check if any errors are in the URL and toast
 	onMount(() => {
-		const urlParams = new URLSearchParams(window.location.search);
+		const urlParams = $page.url.searchParams;
 		const error = urlParams.get('error');
 		if (error) {
 			toast.error(error);
+		} else {
+			// clear the error from the URL by constructing a new URL without just the error param
+			urlParams.delete('error');
+			const newUrl =
+				window.location.protocol +
+				'//' +
+				window.location.host +
+				window.location.pathname +
+				(urlParams.toString() ? '?' + urlParams.toString() : '');
+			goto(newUrl);
 		}
-		// clear the error from the URL by constructing a new URL without just the error param
-		urlParams.delete('error');
-		const newUrl =
-			window.location.protocol +
-			'//' +
-			window.location.host +
-			window.location.pathname +
-			(urlParams.toString() ? '?' + urlParams.toString() : '');
-		window.history.replaceState({ path: newUrl }, '', newUrl);
 	});
 </script>
 
