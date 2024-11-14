@@ -8,7 +8,6 @@
 	import { blurhashToCssGradientString } from '@unpic/placeholder';
 
 	let { data }: { data: PageData } = $props();
-	console.log(data);
 
 	let posts = $state([
 		{ id: 1, imageUrl: '/images/placeholder.png' },

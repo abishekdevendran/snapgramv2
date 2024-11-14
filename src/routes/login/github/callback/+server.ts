@@ -39,7 +39,6 @@ export async function GET(event: RequestEvent): Promise<Response> {
 			status: 400
 		});
 	}
-	console.log('tokens: ', JSON.stringify(tokens));
 	const githubUserResponse = await fetch('https://api.github.com/user', {
 		headers: {
 			Authorization: `Bearer ${tokens.accessToken()}`,
@@ -51,12 +50,11 @@ export async function GET(event: RequestEvent): Promise<Response> {
 	try {
 		githubUser = await githubUserResponse.json();
 	} catch (e) {
-		console.log('GHUB err: ', await githubUserResponseClone.text());
+		console.error('GHUB err: ', await githubUserResponseClone.text());
 		return new Response(null, {
 			status: 400
 		});
 	}
-	console.log('githubUser: ', githubUser);
 	if (!githubUser.email) {
 		const githubUserEmailResponse = await fetch('https://api.github.com/users/emails', {
 			headers: {
@@ -70,7 +68,7 @@ export async function GET(event: RequestEvent): Promise<Response> {
 		try {
 			githubUserEmail = await githubUserEmailResponse.json();
 		} catch (e) {
-			console.log('GHUB err: ', await githubUserEmailResponseClone.text());
+			console.error('GHUB err: ', await githubUserEmailResponseClone.text());
 			return new Response(null, {
 				status: 400
 			});
@@ -88,7 +86,6 @@ export async function GET(event: RequestEvent): Promise<Response> {
 	});
 
 	if (existingUser) {
-		console.log('existingUser: ', existingUser);
 		const sessionToken = generateSessionToken();
 		const session = await createSession(sessionToken, existingUser.id);
 		setSessionTokenCookie(event, sessionToken, session.expiresAt);
@@ -128,13 +125,9 @@ export async function GET(event: RequestEvent): Promise<Response> {
 		name: githubUser.name ?? 'John Doe'
 	});
 
-	console.log('inserted users: ', userVal);
-
 	const sessionToken = generateSessionToken();
 	const session = await createSession(sessionToken, userId);
-	console.log('session: ', session);
 	setSessionTokenCookie(event, sessionToken, session.expiresAt);
-	console.log('set cookie');
 	return new Response(null, {
 		status: 302,
 		headers: {
