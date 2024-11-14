@@ -10,7 +10,6 @@
 		const error = urlParams.get('error');
 		if (error) {
 			toast.error(error);
-		} else {
 			// clear the error from the URL by constructing a new URL without just the error param
 			urlParams.delete('error');
 			const newUrl =
