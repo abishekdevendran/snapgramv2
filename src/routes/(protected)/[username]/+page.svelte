@@ -4,20 +4,30 @@
 	import { Tabs, TabsList, TabsTrigger, TabsContent } from '$lib/components/ui/tabs';
 	import { CircleAlert, Camera, Settings } from 'lucide-svelte';
 	import type { PageData } from './$types';
-	import { Image } from '@unpic/svelte';
-	import { blurhashToCssGradientString } from '@unpic/placeholder';
 	import UpdateUser from '$lib/components/[username]/UpdateUser.svelte';
+	import { createQuery } from '@tanstack/svelte-query';
+	import type { FullFollowers } from '../../api/followers/+server';
+	import type { FullFollowings } from '../../api/followings/+server';
+	import type { FullPosts } from '../../api/posts/+server';
+	import PostThumb from '$lib/components/[username]/PostThumb.svelte';
 
 	let { data }: { data: PageData } = $props();
 
-	let posts = $state([
-		{ id: 1, imageUrl: '/images/placeholder.png' },
-		{ id: 2, imageUrl: '/images/placeholder.png' },
-		{ id: 3, imageUrl: '/images/placeholder.png' },
-		{ id: 4, imageUrl: '/images/placeholder.png' },
-		{ id: 5, imageUrl: '/images/placeholder.png' },
-		{ id: 6, imageUrl: '/images/placeholder.png' }
-	]);
+	// This data is cached by prefetchQuery in +page.ts so no fetch actually happens here
+	const posts = createQuery({
+		queryKey: ['posts'],
+		queryFn: async () => (await (await fetch('/api/posts')).json() as FullPosts)
+	});
+
+	const followers = createQuery({
+		queryKey: ['followers'],
+		queryFn: async () => (await (await fetch('/api/followers')).json() as FullFollowers)
+	});
+
+	const following = createQuery({
+		queryKey: ['following'],
+		queryFn: async () => (await (await fetch('/api/followings')).json() as FullFollowings)
+	});
 </script>
 
 {#if data?.user}
@@ -43,15 +53,15 @@
 				</div>
 				<div class="mb-4 flex">
 					<span class="mr-6">
-						<strong>{data.user?.posts?.length ?? 0}</strong>
+						<strong>{$posts.data?.length ?? 0}</strong>
 						posts
 					</span>
 					<span class="mr-6">
-						<strong>{data?.user?.followers?.length ?? 0}</strong>
+						<strong>{$followers.data?.length ?? 0}</strong>
 						followers
 					</span>
 					<span>
-						<strong>{data?.user?.following?.length ?? 0}</strong>
+						<strong>{$following.data?.length ?? 0}</strong>
 						following
 					</span>
 				</div>
@@ -70,19 +80,15 @@
 			</TabsList>
 			<TabsContent value="posts">
 				<div class="grid grid-cols-3 gap-1">
-					{#if data?.user?.posts?.length === 0}
+					{#if $posts.isLoading}
+						<p class="col-span-3 py-8 text-center">Loading...</p>
+					{:else if $posts.isError}
+						<p class="col-span-3 py-8 text-center">Error loading posts</p>
+					{:else if $posts.data?.length === 0}
 						<p class="col-span-3 py-8 text-center">No posts to show</p>
 					{:else}
-						{#each data?.user?.posts ?? [] as post (post.id)}
-							<Image
-								layout="fullWidth"
-								src={post.images[0].url}
-								alt="Post {post.id}"
-								class="aspect-square w-full object-cover"
-								background={post.images[0]?.blurhash
-									? blurhashToCssGradientString(post.images[0].blurhash)
-									: undefined}
-							/>
+						{#each $posts.data ?? [] as post (post.id)}
+							<PostThumb post={post} />
 						{/each}
 					{/if}
 				</div>

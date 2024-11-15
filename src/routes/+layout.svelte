@@ -1,12 +1,22 @@
 <script lang="ts">
 	import '../app.css';
+	import { QueryClientProvider } from '@tanstack/svelte-query';
 	import { page } from '$app/stores';
 	import NavBar from '$lib/components/NavBar.svelte';
 	import { Toaster } from '$lib/components/ui/sonner';
 	import { ModeWatcher } from 'mode-watcher';
 	import { ProgressBar } from '@prgm/sveltekit-progress-bar';
+	import type { Snippet } from 'svelte';
+	import type { LayoutData } from './$types';
+	import { SvelteQueryDevtools } from '@tanstack/svelte-query-devtools';
 
-	let { children } = $props();
+	let {
+		children,
+		data
+	}: {
+		children: Snippet;
+		data: LayoutData;
+	} = $props();
 
 	const APP_NAME = 'SnapGram';
 	// construct the title
@@ -23,7 +33,10 @@
 <ModeWatcher />
 <Toaster richColors />
 <ProgressBar class="text-primary" zIndex={999} />
-<main class="flex h-[100svh] w-full flex-col bg-muted/40">
-	<NavBar />
-	{@render children()}
-</main>
+<QueryClientProvider client={data.queryClient}>
+	<main class="flex h-[100svh] w-full flex-col bg-muted/40">
+		<NavBar />
+		{@render children()}
+	</main>
+	<SvelteQueryDevtools />
+</QueryClientProvider>

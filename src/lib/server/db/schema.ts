@@ -28,12 +28,12 @@ export const users = pgTable(
 		bio: text('bio')
 	},
 	(table) => {
-		return {
-			usersUsernameIdx: index('users_username_idx').on(table.username),
-			usersEmailIdx: uniqueIndex('users_email_idx').on(table.email),
-			usersGithubIdIdx: index('users_github_id_idx').on(table.githubId),
-			usersGoogleIdIdx: index('users_google_id_idx').on(table.googleId)
-		};
+		return [
+			index('users_username_idx').on(table.username),
+			uniqueIndex('users_email_idx').on(table.email),
+			index('users_github_id_idx').on(table.githubId),
+			index('users_google_id_idx').on(table.googleId)
+		];
 	}
 );
 
@@ -49,10 +49,10 @@ export const posts = pgTable(
 		createdAt: timestamp('created_at', { withTimezone: true, mode: 'date' }).defaultNow()
 	},
 	(table) => {
-		return {
-			postsUserIdIdx: index('posts_user_id_idx').on(table.userId),
-			postsCreatedAtIdx: index('posts_created_at_idx').on(table.createdAt)
-		};
+		return [
+			index('posts_user_id_idx').on(table.userId),
+			index('posts_created_at_idx').on(table.createdAt)
+		];
 	}
 );
 
@@ -73,10 +73,10 @@ export const images = pgTable(
 		createdAt: timestamp('created_at', { withTimezone: true, mode: 'date' }).defaultNow()
 	},
 	(table) => {
-		return {
-			imagesPostIdIdx: index('images_post_id_idx').on(table.postId),
-			imagesIdxIdx: index('images_idx_idx').on(table.idx)
-		};
+		return [
+			index('images_post_id_idx').on(table.postId),
+			index('images_idx_idx').on(table.idx)
+		];
 	}
 );
 
@@ -94,11 +94,11 @@ export const likes = pgTable(
 		createdAt: timestamp('created_at', { withTimezone: true, mode: 'date' }).defaultNow()
 	},
 	(table) => {
-		return {
-			likesUserIdIdx: index('likes_user_id_idx').on(table.userId),
-			likesPostIdIdx: index('likes_post_id_idx').on(table.postId),
-			likesUserIdPostIdIdx: uniqueIndex('likes_user_post_id_idx').on(table.userId, table.postId)
-		};
+		return [
+			index('likes_user_id_idx').on(table.userId),
+			index('likes_post_id_idx').on(table.postId),
+			uniqueIndex('likes_user_post_id_idx').on(table.userId, table.postId)
+		];
 	}
 );
 
@@ -117,11 +117,11 @@ export const comments = pgTable(
 		createdAt: timestamp('created_at', { withTimezone: true, mode: 'date' }).defaultNow()
 	},
 	(table) => {
-		return {
-			commentsPostIdIdx: index('comments_post_id_idx').on(table.postId),
-			commentsUserIdIdx: index('comments_user_id_idx').on(table.userId),
-			commentsPostIdUserIdIdx: index('comments_post_user_id_idx').on(table.postId, table.userId)
-		};
+		return [
+			index('comments_post_id_idx').on(table.postId),
+			index('comments_user_id_idx').on(table.userId),
+			index('comments_post_user_id_idx').on(table.postId, table.userId)
+		];
 	}
 );
 
@@ -138,13 +138,11 @@ export const followers = pgTable(
 		createdAt: timestamp('created_at', { withTimezone: true, mode: 'date' }).defaultNow()
 	},
 	(table) => {
-		return {
-			pk: primaryKey({ columns: [table.userId, table.followingUserId] }),
-			followersUserIdIdx: index('followers_user_id_idx').on(table.userId),
-			followersFollowingUserIdIdx: index('followers_following_user_id_idx').on(
-				table.followingUserId
-			)
-		};
+		return [
+			primaryKey({ columns: [table.userId, table.followingUserId] }),
+			index('followers_user_id_idx').on(table.userId),
+			index('followers_following_user_id_idx').on(table.followingUserId)
+		];
 	}
 );
 
@@ -160,13 +158,11 @@ export const notifications = pgTable(
 		read: boolean('read').default(false),
 		createdAt: timestamp('created_at', { withTimezone: true, mode: 'date' }).defaultNow()
 	},
-	(table) => {
-		return {
-			notificationsUserIdIdx: index('notifications_user_id_idx').on(table.userId),
-			notificationsTypeIdx: index('notifications_type_idx').on(table.type),
-			notificationsUserIdTypeIdx: index('notifications_user_type_idx').on(table.userId, table.type)
-		};
-	}
+	(table) => ([
+		index('notifications_user_id_idx').on(table.userId),
+		index('notifications_type_idx').on(table.type),
+		index('notifications_user_type_idx').on(table.userId, table.type)
+	])
 );
 
 // Relations
