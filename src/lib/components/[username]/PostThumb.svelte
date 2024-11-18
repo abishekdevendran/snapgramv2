@@ -3,15 +3,35 @@
 	import { blurhashToCssGradientString } from '@unpic/placeholder';
 	import type { FullPosts } from '../../../routes/api/posts/+server';
 	import { Heart, MessageCircle } from 'lucide-svelte';
+	import { createQuery } from '@tanstack/svelte-query';
+	import type { FullPost } from '../../../routes/api/posts/[id]/+server';
+	import { derived, writable } from 'svelte/store';
 
 	let {
 		post
 	}: {
 		post: FullPosts[number];
 	} = $props();
+
+	let hasHovered = writable(false);
+
+	// TODO: Replace stores with Runes once Tanstack Query supports it
+	const postFull = createQuery(
+		derived(hasHovered, ($hasHovered) => ({
+			queryKey: ['posts', post.id],
+			queryFn: async () => (await (await fetch(`/api/posts/${post.id}`)).json()) as FullPost,
+			enabled: $hasHovered
+		}))
+	);
 </script>
 
-<div class="group relative overflow-hidden cursor-pointer">
+<!-- svelte-ignore a11y_no_static_element_interactions -->
+<div
+	class="group relative cursor-pointer overflow-hidden"
+	onmouseenter={() => {
+		hasHovered.set(true);
+	}}
+>
 	<Image
 		layout="fullWidth"
 		src={post.images[0].url}
@@ -38,3 +58,4 @@
 		</div>
 	</div>
 </div>
+{#if $postFull.isLoading}{/if}
