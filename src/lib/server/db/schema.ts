@@ -60,6 +60,7 @@ export const posts = pgTable(
 			.notNull()
 			.references(() => users.id),
 		caption: text('caption'),
+		isPrivate: boolean('is_private').default(false),
 		createdAt: timestamp('created_at', { withTimezone: true, mode: 'date' }).defaultNow()
 	},
 	(table) => {

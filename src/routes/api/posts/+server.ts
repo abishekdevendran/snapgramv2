@@ -11,7 +11,7 @@ const full_posts_query = db.query.posts.findMany({
 	},
 	extras: {
 		// TODO: Fix this once Drizzle fixes the issue with $count
-		likeCount: db.$count(likes, sql`likes.post_id = posts.id`).as('imagesCount'),
+		likeCount: db.$count(likes, sql`likes.post_id = posts.id`).as('likesCount'),
 		commentCount: db.$count(comments, sql`comments.post_id = posts.id`).as('commentCount'),
 	}
 }).prepare('get_full_posts');
