@@ -74,10 +74,14 @@ export const actions = {
 				});
 			}
 		}
+		// filter empty values
+		const filtered = Object.fromEntries(
+			Object.entries(resp.data).filter(([_, value]) => value !== undefined && value !== '')
+		);
 		// update user data
 		const user = await db
 			.update(users)
-			.set(resp.data)
+			.set(filtered)
 			.where(eq(users.id, event.locals.user!.id))
 			.returning();
 		return {
