@@ -13,11 +13,25 @@ import {
 import { createInsertSchema, createSelectSchema } from 'drizzle-zod';
 import { z } from 'zod';
 
+// Session table
+export const sessions = pgTable("sessions", {
+	id: text("id").primaryKey(),
+	userId: integer("user_id")
+		.notNull()
+		.references(() => users.id),
+	expiresAt: timestamp("expires_at", {
+		withTimezone: true,
+		mode: "date"
+	}).notNull()
+}, (table) => ([
+	index('sessions_user_id_idx').on(table.userId),
+]));
+
 // User table
 export const users = pgTable(
 	'users',
 	{
-		id: text('id').primaryKey(),
+		id: serial("id").primaryKey(),
 		githubId: integer('github_id'),
 		googleId: text('google_id'),
 		name: text('name').default('John Doe'),
@@ -42,7 +56,7 @@ export const posts = pgTable(
 	'posts',
 	{
 		id: serial('id').primaryKey(),
-		userId: text('user_id')
+		userId: integer('user_id')
 			.notNull()
 			.references(() => users.id),
 		caption: text('caption'),
@@ -85,7 +99,7 @@ export const likes = pgTable(
 	'likes',
 	{
 		id: serial('id').primaryKey(),
-		userId: text('user_id')
+		userId: integer('user_id')
 			.notNull()
 			.references(() => users.id),
 		postId: integer('post_id')
@@ -110,7 +124,7 @@ export const comments = pgTable(
 		postId: integer('post_id')
 			.notNull()
 			.references(() => posts.id),
-		userId: text('user_id')
+		userId: integer('user_id')
 			.notNull()
 			.references(() => users.id),
 		content: text('content').notNull(),
@@ -129,10 +143,10 @@ export const comments = pgTable(
 export const followers = pgTable(
 	'followers',
 	{
-		userId: text('user_id')
+		userId: integer('user_id')
 			.notNull()
 			.references(() => users.id),
-		followingUserId: text('following_user_id')
+		followingUserId: integer('following_user_id')
 			.notNull()
 			.references(() => users.id),
 		createdAt: timestamp('created_at', { withTimezone: true, mode: 'date' }).defaultNow()
@@ -151,7 +165,7 @@ export const notifications = pgTable(
 	'notifications',
 	{
 		id: serial('id').primaryKey(),
-		userId: text('user_id')
+		userId: integer('user_id')
 			.notNull()
 			.references(() => users.id),
 		type: text('type').notNull(),
@@ -166,7 +180,15 @@ export const notifications = pgTable(
 );
 
 // Relations
+export const sessionRelations = relations(sessions, ({ one }) => ({
+	user: one(users, {
+		fields: [sessions.userId],
+		references: [users.id]
+	})
+}));
+
 export const userRelations = relations(users, ({ many }) => ({
+	sessions: many(sessions),
 	posts: many(posts),
 	likes: many(likes),
 	comments: many(comments),
@@ -248,6 +270,7 @@ export const userUpdateSchema = z.object({
 
 // Types for each table
 export type User = typeof users.$inferSelect;
+export type Session = typeof sessions.$inferSelect;
 export type Post = typeof posts.$inferSelect;
 export type Image = typeof images.$inferSelect;
 export type Like = typeof likes.$inferSelect;

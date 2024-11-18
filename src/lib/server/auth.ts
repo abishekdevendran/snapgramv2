@@ -1,10 +1,9 @@
 import { encodeBase32LowerCaseNoPadding, encodeHexLowerCase } from '@oslojs/encoding';
 import { sha256 } from '@oslojs/crypto/sha2';
-import type { RequestEvent } from '@sveltejs/kit';
 import { db } from './db';
-import { type User } from './db/schema';
-import redisClient from '$lib/server/redis';
-import { UPSTASH_REDIS_REST_TOKEN, UPSTASH_REDIS_REST_URL } from '$env/static/private';
+import { users, sessions, type Session, type User } from './db/schema';
+import { eq } from 'drizzle-orm';
+import type { RequestEvent } from '@sveltejs/kit';
 
 export const sessionCookieName = 'auth-session';
 
@@ -15,108 +14,64 @@ export function generateSessionToken(): string {
 	return token;
 }
 
-export async function createSession(token: string, userId: string): Promise<Session> {
+export async function createSession(token: string, userId: number): Promise<Session> {
 	const sessionId = encodeHexLowerCase(sha256(new TextEncoder().encode(token)));
 	const session: Session = {
 		id: sessionId,
 		userId,
 		expiresAt: new Date(Date.now() + 1000 * 60 * 60 * 24 * 30)
 	};
-	if (!redisClient) {
-		throw new Error('Redis client is not available');
-	}
-	await redisClient.set(
-		`session:${session.id}`,
-		JSON.stringify({
-			id: session.id,
-			user_id: session.userId,
-			expires_at: Math.floor(Number(session.expiresAt) / 1000)
-		}),
-		{ ex: Math.floor(Number(session.expiresAt) / 1000) }
-	);
+	await db.insert(sessions).values(session);
 	return session;
 }
 
 export async function validateSessionToken(token: string): Promise<SessionValidationResult> {
 	const sessionId = encodeHexLowerCase(sha256(new TextEncoder().encode(token)));
-	const resp = (await redisClient.get(`session:${sessionId}`)) as string | null;
-	const result = resp
-		? (JSON.parse(resp) as {
-				id: string;
-				user_id: string;
-				expires_at: number;
-			})
-		: null;
-	if (result === null) {
-		return {
-			session: null,
-			user: null
-		};
+	const result = await db
+		.select({ user: users, session: sessions })
+		.from(sessions)
+		.innerJoin(users, eq(sessions.userId, users.id))
+		.where(eq(sessions.id, sessionId));
+	if (result.length < 1) {
+		return { session: null, user: null };
 	}
-	// get user
-	const user = await db.query.users.findFirst({
-		where: (user, { eq }) => eq(user.id, result.user_id)
-	});
-	if (!user) {
-		await redisClient.del(`session:${sessionId}`);
-		return {
-			session: null,
-			user: null
-		};
-	}
-	const session: Session = {
-		id: result.id,
-		userId: result.user_id,
-		expiresAt: new Date(result.expires_at * 1000)
-	};
+	const { user, session } = result[0];
 	if (Date.now() >= session.expiresAt.getTime()) {
-		await redisClient.del(`session:${sessionId}`);
-		return {
-			session: null,
-			user: null
-		};
+		await db.delete(sessions).where(eq(sessions.id, session.id));
+		return { session: null, user: null };
 	}
 	if (Date.now() >= session.expiresAt.getTime() - 1000 * 60 * 60 * 24 * 15) {
 		session.expiresAt = new Date(Date.now() + 1000 * 60 * 60 * 24 * 30);
-		await redisClient.set(
-			`session:${session.id}`,
-			JSON.stringify({
-				id: session.id,
-				user_id: session.userId,
-				expires_at: Math.floor(Number(session.expiresAt) / 1000)
-			}),
-			{ ex: Math.floor(Number(session.expiresAt) / 1000) }
-		);
+		await db
+			.update(sessions)
+			.set({
+				expiresAt: session.expiresAt
+			})
+			.where(eq(sessions.id, session.id));
 	}
 	return { session, user };
 }
 
-export async function invalidateSession(sessionId: string): Promise<void> {
-	await redisClient.del(`session:${sessionId}`);
+export async function invalidateSession(sessionId: string) {
+	await db.delete(sessions).where(eq(sessions.id, sessionId));
 }
 
 export function setSessionTokenCookie(event: RequestEvent, token: string, expiresAt: Date): void {
 	event.cookies.set(sessionCookieName, token, {
 		httpOnly: true,
-		sameSite: 'lax',
+		sameSite: "lax",
 		expires: expiresAt,
-		path: '/'
+		path: "/"
 	});
 }
 
 export function deleteSessionTokenCookie(event: RequestEvent): void {
-	event.cookies.set(sessionCookieName, '', {
+	event.cookies.set("session", "", {
 		httpOnly: true,
-		sameSite: 'lax',
+		sameSite: "lax",
 		maxAge: 0,
-		path: '/'
+		path: "/"
 	});
-}
-
-export interface Session {
-	id: string;
-	userId: string;
-	expiresAt: Date;
 }
 
 export type SessionValidationResult =

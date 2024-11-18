@@ -16,10 +16,11 @@ const db = drizzle(client, {
 });
 
 if (!process.env.TESTING_USER_ID) throw new Error('TESTING_USER_ID is not set');
-const USER_ID = process.env.TESTING_USER_ID;
+const USER_ID = Number(process.env.TESTING_USER_ID);
+if (isNaN(USER_ID)) throw new Error('TESTING_USER_ID is not a number');
 
 // Function to generate random post
-const generatePost = (userId: string) => ({
+const generatePost = (userId: number) => ({
 	userId,
 	caption: faker.lorem.paragraph()
 });
@@ -42,46 +43,39 @@ const generateImage = async (postId: number, idx: number) => {
 };
 
 // Function to generate random like
-const generateLike = (postId: number, userId: string) => ({
+const generateLike = (postId: number, userId: number) => ({
 	userId,
 	postId
 });
 
 // Function to generate random comment
-const generateComment = (postId: number, userId: string) => ({
+const generateComment = (postId: number, userId: number) => ({
 	userId,
 	postId,
 	content: faker.lorem.paragraph()
 });
 
 // Function to generate random notification
-const generateNotification = (userId: string) => ({
+const generateNotification = (userId: number) => ({
 	userId,
 	type: faker.helpers.arrayElement(['like', 'comment', 'follow'])
 });
 
-function generateUserId() {
-	// ID with 120 bits of entropy, or about the same as UUID v4.
-	const bytes = crypto.getRandomValues(new Uint8Array(15));
-	const id = encodeBase64url(bytes);
-	return id;
-}
-
 // Function to generate random user
-const generateUser = async (userId?: string) => {
+const generateUser = async (userId?: number) => {
 	// Generate 2 posts
 	if (!userId) {
-		userId = generateUserId();
 		// insert user
-		await db
+		const u=await db
 			.insert(schema.users)
 			.values({
-				id: userId,
 				username: faker.internet.username(),
+				name: faker.person.fullName(),
 				email: faker.internet.email(),
 				bio: faker.lorem.paragraph()
 			})
-			.execute();
+			.returning();
+		userId = u[0].id;
 	}
 	const posts = Array(2)
 		.fill(null)

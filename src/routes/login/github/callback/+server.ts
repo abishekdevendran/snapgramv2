@@ -8,13 +8,6 @@ import { db } from '$lib/server/db';
 import { users } from '$lib/server/db/schema';
 import { encodeBase64url } from '@oslojs/encoding';
 
-function generateUserId() {
-	// ID with 120 bits of entropy, or about the same as UUID v4.
-	const bytes = crypto.getRandomValues(new Uint8Array(15));
-	const id = encodeBase64url(bytes);
-	return id;
-}
-
 export async function GET(event: RequestEvent): Promise<Response> {
 	const code = event.url.searchParams.get('code');
 	const state = event.url.searchParams.get('state');
@@ -113,20 +106,18 @@ export async function GET(event: RequestEvent): Promise<Response> {
 
 	// TODO: Replace this with your own DB query.
 	// const users = await createUser(githubUserId, githubUsername);
-	const userId = generateUserId();
 	const userVal = await db.insert(users).values({
 		githubId: githubUserId,
 		username: githubUsername,
 		createdAt: new Date(),
 		profilePictureUrl: githubUser.avatar_url,
 		email: githubUser.email,
-		id: userId,
 		bio: 'Hi, I am new on SnapGram!',
 		name: githubUser.name ?? 'John Doe'
-	});
+	}).returning();
 
 	const sessionToken = generateSessionToken();
-	const session = await createSession(sessionToken, userId);
+	const session = await createSession(sessionToken, userVal[0].id);
 	setSessionTokenCookie(event, sessionToken, session.expiresAt);
 	return new Response(null, {
 		status: 302,
