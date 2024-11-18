@@ -8,6 +8,7 @@ export async function load() {
         enabled: browser,
         staleTime: 60 * 1000,
         refetchOnMount: false,
+        refetchOnWindowFocus: false,
       },
     },
   })

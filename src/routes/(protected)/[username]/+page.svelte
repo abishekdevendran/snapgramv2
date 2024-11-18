@@ -16,17 +16,17 @@
 	// This data is cached by prefetchQuery in +page.ts so no fetch actually happens here
 	const posts = createQuery({
 		queryKey: ['posts'],
-		queryFn: async () => (await (await fetch('/api/posts')).json() as FullPosts)
+		queryFn: async () => (await (await fetch('/api/posts')).json()) as FullPosts
 	});
 
 	const followers = createQuery({
 		queryKey: ['followers'],
-		queryFn: async () => (await (await fetch('/api/followers')).json() as FullFollowers)
+		queryFn: async () => (await (await fetch('/api/followers')).json()) as FullFollowers
 	});
 
 	const following = createQuery({
-		queryKey: ['following'],
-		queryFn: async () => (await (await fetch('/api/followings')).json() as FullFollowings)
+		queryKey: ['followings'],
+		queryFn: async () => (await (await fetch('/api/followings')).json()) as FullFollowings
 	});
 </script>
 
@@ -88,7 +88,7 @@
 						<p class="col-span-3 py-8 text-center">No posts to show</p>
 					{:else}
 						{#each $posts.data ?? [] as post (post.id)}
-							<PostThumb post={post} />
+							<PostThumb {post} />
 						{/each}
 					{/if}
 				</div>
