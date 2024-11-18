@@ -8,30 +8,33 @@ import {
 	boolean,
 	primaryKey,
 	index,
-	uniqueIndex
+	uniqueIndex,
+	pgEnum
 } from 'drizzle-orm/pg-core';
 import { createInsertSchema, createSelectSchema } from 'drizzle-zod';
 import { z } from 'zod';
 
 // Session table
-export const sessions = pgTable("sessions", {
-	id: text("id").primaryKey(),
-	userId: integer("user_id")
-		.notNull()
-		.references(() => users.id),
-	expiresAt: timestamp("expires_at", {
-		withTimezone: true,
-		mode: "date"
-	}).notNull()
-}, (table) => ([
-	index('sessions_user_id_idx').on(table.userId),
-]));
+export const sessions = pgTable(
+	'sessions',
+	{
+		id: text('id').primaryKey(),
+		userId: integer('user_id')
+			.notNull()
+			.references(() => users.id),
+		expiresAt: timestamp('expires_at', {
+			withTimezone: true,
+			mode: 'date'
+		}).notNull()
+	},
+	(table) => [index('sessions_user_id_idx').on(table.userId)]
+);
 
 // User table
 export const users = pgTable(
 	'users',
 	{
-		id: serial("id").primaryKey(),
+		id: serial('id').primaryKey(),
 		githubId: integer('github_id'),
 		googleId: text('google_id'),
 		name: text('name').default('John Doe'),
@@ -88,10 +91,7 @@ export const images = pgTable(
 		createdAt: timestamp('created_at', { withTimezone: true, mode: 'date' }).defaultNow()
 	},
 	(table) => {
-		return [
-			index('images_post_id_idx').on(table.postId),
-			index('images_idx_idx').on(table.idx)
-		];
+		return [index('images_post_id_idx').on(table.postId), index('images_idx_idx').on(table.idx)];
 	}
 );
 
@@ -173,11 +173,27 @@ export const notifications = pgTable(
 		read: boolean('read').default(false),
 		createdAt: timestamp('created_at', { withTimezone: true, mode: 'date' }).defaultNow()
 	},
-	(table) => ([
+	(table) => [
 		index('notifications_user_id_idx').on(table.userId),
 		index('notifications_type_idx').on(table.type),
 		index('notifications_user_type_idx').on(table.userId, table.type)
-	])
+	]
+);
+
+// Uploads table
+export const uploadStatus = pgEnum('UploadStatus', ['INITIATED', 'COMPLETED', 'FAILED']);
+export const uploads = pgTable(
+	'uploads',
+	{
+		id: serial('id').primaryKey(),
+		userId: integer('user_id')
+			.notNull()
+			.references(() => users.id),
+		url: text('url').notNull(),
+		createdAt: timestamp('created_at', { withTimezone: true, mode: 'date' }).defaultNow(),
+		status: uploadStatus('status').notNull()
+	},
+	(table) => [index('uploads_user_id_idx').on(table.userId)]
 );
 
 // Relations
@@ -199,7 +215,8 @@ export const userRelations = relations(users, ({ many }) => ({
 	notifications: many(notifications),
 	following: many(followers, {
 		relationName: 'followingUser'
-	})
+	}),
+	uploads: many(uploads)
 }));
 
 export const postRelations = relations(posts, ({ many, one }) => ({
@@ -257,6 +274,13 @@ export const followerRelations = relations(followers, ({ one }) => ({
 export const notificationRelations = relations(notifications, ({ one }) => ({
 	user: one(users, {
 		fields: [notifications.userId],
+		references: [users.id]
+	})
+}));
+
+export const uploadRelations = relations(uploads, ({ one }) => ({
+	user: one(users, {
+		fields: [uploads.userId],
 		references: [users.id]
 	})
 }));

@@ -11,6 +11,9 @@ importers:
       '@aws-sdk/client-s3':
         specifier: ^3.693.0
         version: 3.693.0
+      '@aws-sdk/s3-request-presigner':
+        specifier: ^3.693.0
+        version: 3.693.0
       '@neondatabase/serverless':
         specifier: ^0.10.3
         version: 0.10.3
@@ -47,12 +50,9 @@ importers:
       cloudflare:
         specifier: ^3.5.0
         version: 3.5.0
-      cloudinary:
-        specifier: ^2.5.1
-        version: 2.5.1
-      cropperjs:
-        specifier: ^1.6.2
-        version: 1.6.2
+      compressorjs:
+        specifier: ^1.2.1
+        version: 1.2.1
       drizzle-orm:
         specifier: ^0.36.2
         version: 0.36.2(@cloudflare/workers-types@4.20241106.0)(@neondatabase/serverless@0.10.3)(@types/pg@8.11.6)
@@ -60,8 +60,8 @@ importers:
         specifier: ^0.5.1
         version: 0.5.1(drizzle-orm@0.36.2(@cloudflare/workers-types@4.20241106.0)(@neondatabase/serverless@0.10.3)(@types/pg@8.11.6))(zod@3.23.8)
       lucide-svelte:
-        specifier: ^0.456.0
-        version: 0.456.0(svelte@5.1.13)
+        specifier: ^0.460.1
+        version: 0.460.1(svelte@5.1.13)
       svelte-easy-crop:
         specifier: ^3.0.1
         version: 3.0.1(svelte@5.1.13)
@@ -303,6 +303,10 @@ packages:
     resolution: {integrity: sha512-YLUkMsUY0GLW/nfwlZ69cy1u07EZRmsv8Z9m0qW317/EZaVx59hcvmcvb+W4bFqj5E8YImTjoGfE4cZ0F9mkyw==}
     engines: {node: '>=16.0.0'}
 
+  '@aws-sdk/s3-request-presigner@3.693.0':
+    resolution: {integrity: sha512-I/TCM43kZn1xb+EWMAjkcisDVrq3mYsu0ZFP81J9K/PM6n3s9bK04jaY56c3pCl6btigIOHhreutYSRRBJsCDw==}
+    engines: {node: '>=16.0.0'}
+
   '@aws-sdk/signature-v4-multi-region@3.693.0':
     resolution: {integrity: sha512-s7zbbsoVIriTR4ZGaateKuTqz6ddpazAyHvjk7I9kd+NvGNPiuAI18UdbuiiRI6K5HuYKf1ah6mKWFGPG15/kQ==}
     engines: {node: '>=16.0.0'}
@@ -323,6 +327,10 @@ packages:
 
   '@aws-sdk/util-endpoints@3.693.0':
     resolution: {integrity: sha512-eo4F6DRQ/kxS3gxJpLRv+aDNy76DxQJL5B3DPzpr9Vkq0ygVoi4GT5oIZLVaAVIJmi6k5qq9dLsYZfWLUxJJSg==}
+    engines: {node: '>=16.0.0'}
+
+  '@aws-sdk/util-format-url@3.693.0':
+    resolution: {integrity: sha512-0O4fSq45GOwC89Os0f92z9kK1AV22+W980O+v+GkMLUkRG7/nsIJkq1LKiIPV+sbC+KC/HmW4yThxFzHO7GDxA==}
     engines: {node: '>=16.0.0'}
 
   '@aws-sdk/util-locate-window@3.693.0':
@@ -1720,6 +1728,9 @@ packages:
   blake3-wasm@2.1.5:
     resolution: {integrity: sha512-F1+K8EbfOZE49dtoPtmxUQrpXaBIl3ICvasLh+nJta0xkz+9kF/7uet9fLnwKqhDrmj6g+6K3Tw9yQPUg2ka5g==}
 
+  blueimp-canvas-to-blob@3.29.0:
+    resolution: {integrity: sha512-0pcSSGxC0QxT+yVkivxIqW0Y4VlO2XSDPofBAqoJ1qJxgH9eiUDLv50Rixij2cDuEfx4M6DpD9UGZpRhT5Q8qg==}
+
   blurhash@2.0.5:
     resolution: {integrity: sha512-cRygWd7kGBQO3VEhPiTgq4Wc43ctsM+o46urrmPOiuAe+07fzlSB9OJVdpgDL0jPqXUVQ9ht7aq7kxOeJHRK+w==}
 
@@ -1778,10 +1789,6 @@ packages:
   cloudflare@3.5.0:
     resolution: {integrity: sha512-sIRZ4K2WQf8tZ74gZGan3u6+50VY1cB6uNc9XIGGLQa7Ti/nrvvadirm8EPVFlQMG11PUXPsX1Buheh4MPLiew==}
 
-  cloudinary@2.5.1:
-    resolution: {integrity: sha512-CNg6uU53Hl4FEVynkTGpt5bQEAQWDHi3H+Sm62FzKf5uQHipSN2v7qVqS8GRVqeb0T1WNV+22+75DOJeRXYeSQ==}
-    engines: {node: '>=9'}
-
   clsx@2.1.1:
     resolution: {integrity: sha512-eYm0QWBtUrBWZWG0d386OGAw16Z995PiOVo2B7bjWSbHedGl5e0ZWaq65kOGgUSNesEIDkB9ISbTg/JK9dhCZA==}
     engines: {node: '>=6'}
@@ -1801,6 +1808,9 @@ packages:
     resolution: {integrity: sha512-NOKm8xhkzAjzFx8B2v5OAHT+u5pRQc2UCa2Vq9jYL/31o2wi9mxBA7LIFs3sV5VSC49z6pEhfbMULvShKj26WA==}
     engines: {node: '>= 6'}
 
+  compressorjs@1.2.1:
+    resolution: {integrity: sha512-+geIjeRnPhQ+LLvvA7wxBQE5ddeLU7pJ3FsKFWirDw6veY3s9iLxAQEw7lXGHnhCJvBujEQWuNnGzZcvCvdkLQ==}
+
   cookie@0.6.0:
     resolution: {integrity: sha512-U71cyTamuh1CRNCfpGY6to28lxvNwPG4Guz/EVjgf3Jmzv0vlDp1atT9eS5dDjMYHucpHbWns6Lwf3BKz6svdw==}
     engines: {node: '>= 0.6'}
@@ -1808,9 +1818,6 @@ packages:
   cookie@0.7.2:
     resolution: {integrity: sha512-yki5XnKuf750l50uGTllt6kKILY4nQ1eNIQatoXEByZ5dWgnKqbnqmTrBE5B4N7lrMJKQ2ytWMiTO2o0v6Ew/w==}
     engines: {node: '>= 0.6'}
-
-  cropperjs@1.6.2:
-    resolution: {integrity: sha512-nhymn9GdnV3CqiEHJVai54TULFAE3VshJTXSqSJKa8yXAKyBKDWdhHarnlIPrshJ0WMFTGuFvG02YjLXfPiuOA==}
 
   cross-spawn@7.0.5:
     resolution: {integrity: sha512-ZVJrKKYunU38/76t0RMOulHOnUcbU9GbpWKAOZ0mhjr7CX6FVrH+4FrAapSOekrgFQ3f/8gwMEuIft0aKq6Hug==}
@@ -2170,6 +2177,10 @@ packages:
     resolution: {integrity: sha512-ZMERYes6pDydyuGidse7OsHxtbI7WVeUEozgR/g7rd0xUimYNlvZRE/K2MgZTjWy725IfelLeVcEM97mmtRGXw==}
     engines: {node: '>=8'}
 
+  is-blob@2.1.0:
+    resolution: {integrity: sha512-SZ/fTft5eUhQM6oF/ZaASFDEdbFVe89Imltn9uZr03wdKMcWNVYSMjQPFtg05QuNkt5l5c135ElvXEQG0rk4tw==}
+    engines: {node: '>=6'}
+
   is-core-module@2.15.1:
     resolution: {integrity: sha512-z0vtXSwucUJtANQWldhbtbt7BnL0vxiFjIdDLAatwhDYty2bad6s+rijD6Ri4YuYJubLzIJLUidCh09e1djEVQ==}
     engines: {node: '>= 0.4'}
@@ -2236,17 +2247,14 @@ packages:
   lodash.merge@4.6.2:
     resolution: {integrity: sha512-0KpjqXRVvrYyCsX1swR/XTK0va6VQkQM6MNo7PqW77ByjAhoARA8EfrP1N4+KlKj8YS0ZUCtRT/YUuhyYDujIQ==}
 
-  lodash@4.17.21:
-    resolution: {integrity: sha512-v2kDEe57lecTulaDIuNTPy3Ry4gLGJ6Z1O3vE1krgXZNrsQ+LFTGHVxVjcXPs17LhbZVGedAJv8XZ1tvj5FvSg==}
-
   loupe@3.1.2:
     resolution: {integrity: sha512-23I4pFZHmAemUnz8WZXbYRSKYj801VDaNv9ETuMh7IrMc7VuVVSo+Z9iLE3ni30+U48iDWfi30d3twAXBYmnCg==}
 
   lru-cache@10.4.3:
     resolution: {integrity: sha512-JNAzZcXrCt42VGLuYz0zfAzDfAvJWW6AfYlDBQyDV5DClI2m5sAmK+OIO7s59XfsRsWHp02jAJrRadPRGTt6SQ==}
 
-  lucide-svelte@0.456.0:
-    resolution: {integrity: sha512-SSdmxJOmL1h42ZypuGr54dYsXAT5o6WkQPKVDFnnrD0liOaXzfNNJuA7JbpkO9FFozBchyVpB1A1mKRmXOD8ug==}
+  lucide-svelte@0.460.1:
+    resolution: {integrity: sha512-guJjJSeWlKivsEG51Xg41egunBMJcobhDmkLv/NYTXmXyCEwxMf1A+HX7RvDEKiXbXYgtLImih67tI08MSUOkA==}
     peerDependencies:
       svelte: ^3 || ^4 || ^5.0.0-next.42
 
@@ -2558,14 +2566,6 @@ packages:
 
   printable-characters@1.0.42:
     resolution: {integrity: sha512-dKp+C4iXWK4vVYZmYSd0KBH5F/h1HoZRsbJ82AVKRO3PEo8L4lBS/vLwhVtpwwuYcoIsVY+1JYKR268yn480uQ==}
-
-  q@1.5.1:
-    resolution: {integrity: sha512-kV/CThkXo6xyFEZUugw/+pIOywXcDbFYgSct5cT3gqlbkBE1SJdwy6UQoZvodiWF/ckQLZyDE/Bu1M6gVu5lVw==}
-    engines: {node: '>=0.6.0', teleport: '>=0.2.0'}
-    deprecated: |-
-      You or someone you depend on is using Q, the JavaScript Promise library that gave JavaScript developers strong feelings about promises. They can almost certainly migrate to the native JavaScript promise now. Thank you literally everyone for joining me in this bet against the odds. Be excellent to each other.
-
-      (For a CapTP with native promises, see @endo/eventual-send and @endo/captp)
 
   qs@6.13.0:
     resolution: {integrity: sha512-+38qI9SOr8tfZ4QmJNplMUxqjbe7LKvvZgWdExBOmd+egZTtjLB67Gu0HRX3u/XOq7UU2Nx6nsjvS16Z9uwfpg==}
@@ -3479,6 +3479,17 @@ snapshots:
       '@smithy/util-middleware': 3.0.10
       tslib: 2.8.1
 
+  '@aws-sdk/s3-request-presigner@3.693.0':
+    dependencies:
+      '@aws-sdk/signature-v4-multi-region': 3.693.0
+      '@aws-sdk/types': 3.692.0
+      '@aws-sdk/util-format-url': 3.693.0
+      '@smithy/middleware-endpoint': 3.2.3
+      '@smithy/protocol-http': 4.1.7
+      '@smithy/smithy-client': 3.4.4
+      '@smithy/types': 3.7.1
+      tslib: 2.8.1
+
   '@aws-sdk/signature-v4-multi-region@3.693.0':
     dependencies:
       '@aws-sdk/middleware-sdk-s3': 3.693.0
@@ -3511,6 +3522,13 @@ snapshots:
       '@aws-sdk/types': 3.692.0
       '@smithy/types': 3.7.1
       '@smithy/util-endpoints': 2.1.6
+      tslib: 2.8.1
+
+  '@aws-sdk/util-format-url@3.693.0':
+    dependencies:
+      '@aws-sdk/types': 3.692.0
+      '@smithy/querystring-builder': 3.0.10
+      '@smithy/types': 3.7.1
       tslib: 2.8.1
 
   '@aws-sdk/util-locate-window@3.693.0':
@@ -4684,6 +4702,8 @@ snapshots:
 
   blake3-wasm@2.1.5: {}
 
+  blueimp-canvas-to-blob@3.29.0: {}
+
   blurhash@2.0.5: {}
 
   bowser@2.11.0: {}
@@ -4767,11 +4787,6 @@ snapshots:
     transitivePeerDependencies:
       - encoding
 
-  cloudinary@2.5.1:
-    dependencies:
-      lodash: 4.17.21
-      q: 1.5.1
-
   clsx@2.1.1: {}
 
   color-convert@2.0.1:
@@ -4786,11 +4801,14 @@ snapshots:
 
   commander@4.1.1: {}
 
+  compressorjs@1.2.1:
+    dependencies:
+      blueimp-canvas-to-blob: 3.29.0
+      is-blob: 2.1.0
+
   cookie@0.6.0: {}
 
   cookie@0.7.2: {}
-
-  cropperjs@1.6.2: {}
 
   cross-spawn@7.0.5:
     dependencies:
@@ -5144,6 +5162,8 @@ snapshots:
     dependencies:
       binary-extensions: 2.3.0
 
+  is-blob@2.1.0: {}
+
   is-core-module@2.15.1:
     dependencies:
       hasown: 2.0.2
@@ -5192,13 +5212,11 @@ snapshots:
 
   lodash.merge@4.6.2: {}
 
-  lodash@4.17.21: {}
-
   loupe@3.1.2: {}
 
   lru-cache@10.4.3: {}
 
-  lucide-svelte@0.456.0(svelte@5.1.13):
+  lucide-svelte@0.460.1(svelte@5.1.13):
     dependencies:
       svelte: 5.1.13
 
@@ -5407,8 +5425,6 @@ snapshots:
   prettier@3.3.3: {}
 
   printable-characters@1.0.42: {}
-
-  q@1.5.1: {}
 
   qs@6.13.0:
     dependencies:

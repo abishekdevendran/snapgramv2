@@ -1,8 +1,9 @@
 import { db } from '$lib/server/db/index.js';
-import { users, userUpdateSchema } from '$lib/server/db/schema.js';
+import { uploads, users, userUpdateSchema } from '$lib/server/db/schema.js';
 import { fail, redirect } from '@sveltejs/kit';
-import { eq } from 'drizzle-orm';
+import { and, eq } from 'drizzle-orm';
 import type { FullUser } from '../../api/user/+server.js';
+import { PUBLIC_R2_URL } from '$env/static/public';
 
 export const load = async (event) => {
 	if (!event.locals.user) {
@@ -12,12 +13,16 @@ export const load = async (event) => {
 		};
 	}
 	if (event.locals.user.username === event.params.username) {
-		const user = await (await event.fetch('/api/user')).json() as FullUser;
+		const user = (await (await event.fetch('/api/user')).json()) as FullUser;
 		return { user };
 	} else {
 		return redirect(301, '/dashboard?error=Unauthorized');
 	}
 };
+
+function getPfPFinalURL(fileName: string): string {
+	return PUBLIC_R2_URL + '/profile-picture/' + fileName;
+}
 
 export const actions = {
 	patchUser: async (event) => {
@@ -38,9 +43,6 @@ export const actions = {
 		// validate partial user data on formdata
 		const resp = userUpdateSchema.safeParse(object);
 		if (!resp.success) {
-			// return new Response(JSON.stringify(resp.error), {
-			// 	status: 400
-			// });
 			return fail(400, {
 				error: resp.error.flatten()
 			});
@@ -50,9 +52,6 @@ export const actions = {
 				where: (user, { eq }) => eq(user.username, resp.data.username!)
 			});
 			if (user) {
-				// return new Response(JSON.stringify({ message: 'Username already exists' }), {
-				// 	status: 400
-				// });
 				return fail(400, {
 					error: 'Username already exists'
 				});
@@ -66,9 +65,6 @@ export const actions = {
 				where: (user, { eq }) => eq(user.profilePictureUrl, resp.data.profilePictureUrl!)
 			});
 			if (user) {
-				// return new Response(JSON.stringify({ message: 'Identity theft is not a joke, Jim!' }), {
-				// 	status: 400
-				// });
 				return fail(400, {
 					error: 'Identity theft is not a joke, Jim!'
 				});
@@ -84,6 +80,23 @@ export const actions = {
 			.set(filtered)
 			.where(eq(users.id, event.locals.user!.id))
 			.returning();
+
+		// If profilePictureUrl is in filtered, update uploads table status to 'COMPLETED'
+		if (filtered.profilePictureUrl) {
+			try {
+				await db
+					.update(uploads)
+					.set({ status: 'COMPLETED' })
+					.where(
+						and(
+							eq(uploads.userId, event.locals.user!.id),
+							eq(uploads.url, filtered.profilePictureUrl)
+						)
+					);
+			} catch (e) {
+				console.log('Uploads table entry not found, might be an external image');
+			}
+		}
 		return {
 			success: true,
 			user
