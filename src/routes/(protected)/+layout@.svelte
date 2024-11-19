@@ -16,11 +16,11 @@
 	<!-- svelte-ignore a11y_click_events_have_key_events -->
 	<!-- svelte-ignore a11y_no_static_element_interactions -->
 	<div
-		class="flex cursor-pointer select-none items-center gap-2 rounded-lg p-1 hover:scale-105 hover:bg-primary/20 max-lg:hidden transition-all duration-300"
+		class="flex cursor-pointer select-none items-center gap-2 rounded-lg p-1 transition-all duration-300 hover:bg-primary/20 max-lg:hidden"
 		onclick={(e) => {
 			e.preventDefault();
 			e.stopPropagation();
-			if(!e.isTrusted) return;
+			if (!e.isTrusted) return;
 			// get first child
 			const child = e.currentTarget.children[0].children[0] as HTMLElement;
 			child.click();
