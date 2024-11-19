@@ -16,7 +16,7 @@
 	<!-- svelte-ignore a11y_click_events_have_key_events -->
 	<!-- svelte-ignore a11y_no_static_element_interactions -->
 	<div
-		class="flex cursor-pointer select-none items-center gap-2 rounded-lg p-1 hover:scale-105 hover:bg-primary/20 max-lg:hidden"
+		class="flex cursor-pointer select-none items-center gap-2 rounded-lg p-1 hover:scale-105 hover:bg-primary/20 max-lg:hidden transition-all duration-300"
 		onclick={(e) => {
 			e.preventDefault();
 			e.stopPropagation();
