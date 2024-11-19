@@ -34,8 +34,7 @@
 <Toaster richColors />
 <ProgressBar class="text-primary" zIndex={999} />
 <QueryClientProvider client={data.queryClient}>
-	<main class="flex h-[100svh] w-full flex-col bg-muted/40">
-		<NavBar />
+	<main class="flex min-h-[100svh] w-full flex-col bg-muted/40 font-poppins">
 		{@render children()}
 	</main>
 	<SvelteQueryDevtools />

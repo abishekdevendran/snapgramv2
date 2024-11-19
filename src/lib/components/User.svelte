@@ -3,15 +3,22 @@
 	import { Button } from '$lib/components/ui/button/index.js';
 	import * as Avatar from '$lib/components/ui/avatar/index.js';
 	import * as DropdownMenu from '$lib/components/ui/dropdown-menu/index.js';
-	import { enhance } from '$app/forms';
 	import { goto } from '$app/navigation';
-	import { toast } from 'svelte-sonner';
 	import Logout from '$lib/components/Logout.svelte';
+
+	let isOpen = $state(false);
 </script>
 
 {#if $page.data.user}
-	<DropdownMenu.Root>
-		<DropdownMenu.Trigger>
+	<DropdownMenu.Root open={isOpen} onOpenChange={(e) => (isOpen = e)}>
+		<DropdownMenu.Trigger
+			onclick={(e) => {
+				console.log('USER TRIGGER');
+				e.preventDefault();
+				e.stopPropagation();
+				isOpen = !isOpen;
+			}}
+		>
 			<Avatar.Root class="hover:bg-primary/90">
 				<Avatar.Image
 					class="hover:opacity-80"
