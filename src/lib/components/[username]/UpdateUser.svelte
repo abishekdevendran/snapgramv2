@@ -12,8 +12,8 @@
 		DialogClose
 	} from '$lib/components/ui/dialog';
 	import { toast } from 'svelte-sonner';
-	import type { FullUser } from '../../../routes/(protected)/[username]/+page.server';
 	import { enhance } from '$app/forms';
+	import type { FullUser } from '../../../routes/api/user/+server';
 
 	let {
 		user
@@ -21,8 +21,6 @@
 		user: FullUser;
 	} = $props();
 
-	let fullName = $state('');
-	let username = $state('');
 	let open = $state(false);
 </script>
 
@@ -80,7 +78,6 @@
 							id="fullName"
 							name="name"
 							placeholder={user.name}
-							bind:value={fullName}
 							class="col-span-3"
 						/>
 					</div>
@@ -90,7 +87,15 @@
 							id="username"
 							name="username"
 							placeholder={user.username}
-							bind:value={username}
+							class="col-span-3"
+						/>
+					</div>
+					<div class="grid grid-cols-4 items-center gap-4">
+						<Label for="bio" class="text-right">Bio</Label>
+						<Input
+							id="bio"
+							name="bio"
+							placeholder={user.bio}
 							class="col-span-3"
 						/>
 					</div>
