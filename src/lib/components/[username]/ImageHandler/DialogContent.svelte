@@ -128,7 +128,7 @@
 		{#if loadedFile}
 			<ImageEditor image={loadedFile} setFinalImage={(image) => (finalImage = image)} />
 		{/if}
-		<Dialog.Footer>
+		<Dialog.Footer class="gap-2 max-md:mt-2">
 			<Button
 				disabled={isProcessing}
 				type="reset"

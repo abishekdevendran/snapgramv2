@@ -10,6 +10,7 @@
 	import LightSwitch from '$lib/components/LightSwitch.svelte';
 	import NavBar from '$lib/components/NavBar.svelte';
 	import { mode } from 'mode-watcher';
+	import CreatePost from '$lib/components/[username]/CreatePost.svelte';
 </script>
 
 {#snippet extended(Component: any, title: string)}
@@ -42,12 +43,15 @@
 <div class="flex h-full max-sm:flex-col">
 	<NavBar />
 	<aside
-		class="fixed bottom-0 z-50 flex w-full gap-2 border-r bg-background p-4 max-lg:items-center max-sm:justify-around sm:sticky sm:top-0 sm:h-screen sm:w-16 sm:flex-col lg:w-64"
+		class="fixed bottom-0 z-50 flex w-full gap-2 border-r bg-background p-4 max-lg:items-center max-sm:justify-around justify-between sm:sticky sm:top-0 sm:h-screen sm:w-16 sm:flex-col md:gap-4 lg:w-64"
 	>
 		<h1 class="font-poppins text-3xl font-black max-lg:hidden">SnapGram</h1>
 		<h1 class="font-poppins text-3xl font-black max-sm:hidden lg:hidden">S</h1>
-		{@render extended(User, $page.data.user.name)}
-		{@render extended(LightSwitch, ($mode === 'dark' ? 'Dark' : 'Light') + ' mode')}
+		<div class="flex gap-4 sm:flex-col max-lg:w-full max-lg:justify-around">
+			{@render extended(User, $page.data.user.name)}
+			{@render extended(CreatePost, 'Create Post')}
+			{@render extended(LightSwitch, ($mode === 'dark' ? 'Dark' : 'Light') + ' mode')}
+		</div>
 	</aside>
 
 	{@render children()}

@@ -7,12 +7,12 @@ import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
 import { json } from '@sveltejs/kit';
 import { z } from 'zod';
 
-function getPfPFinalURL(fileName: string): string {
-	return PUBLIC_R2_URL + '/profile-picture/' + fileName;
-}
-
 // zod enum type for uploadType 'profile-picture' or 'post-image'
 const uploadTypeSchema = z.enum(['profile-picture', 'post-image']);
+
+function getFinalURL(fileName: string, uploadType: z.infer<typeof uploadTypeSchema>): string {
+	return PUBLIC_R2_URL + `/${uploadType}/` + fileName;
+}
 
 export const GET = async ({ fetch, locals, url }) => {
 	if (!locals.user) {
@@ -38,7 +38,7 @@ export const GET = async ({ fetch, locals, url }) => {
 	await db.insert(uploads).values({
 		userId: locals.user.id,
 		status: 'INITIATED',
-		url: getPfPFinalURL(fileName),
+		url: getFinalURL(fileName, uploadType.data),
 	});
 
 	return json({
