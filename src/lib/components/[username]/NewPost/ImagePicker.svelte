@@ -6,7 +6,10 @@
 	let {
 		files = $bindable()
 	}: {
-		files: any[];
+		files: {
+			fileURL: string;
+			caption: string | null;
+		}[];
 	} = $props();
 
 	function handleFilesSelect(e: {
@@ -20,7 +23,15 @@
 			toast.error('Please select a file to continue');
 		}
 		let proccedFiles = acceptedFiles.map((file) => URL.createObjectURL(file));
-		files = [...files, ...proccedFiles];
+		// filter out the files that are already in the list
+		proccedFiles = proccedFiles.filter((file) => !files.some((f) => f.fileURL === file));
+		files = [
+			...files,
+			...proccedFiles.map((file) => ({
+				fileURL: file,
+				caption: null
+			}))
+		];
 	}
 </script>
 

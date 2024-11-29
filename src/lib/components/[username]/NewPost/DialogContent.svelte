@@ -9,6 +9,7 @@
 	import { page } from '$app/stores';
 	import { invalidateAll } from '$app/navigation';
 	import PostImages from './PostImages.svelte';
+	import PostPreview from './PostPreview.svelte';
 
 	let tabStage = $state<'upload' | 'finish-up'>('upload');
 	let isProcessing = $state(false);
@@ -17,7 +18,60 @@
 		return PUBLIC_R2_URL + '/profile-picture/' + fileName;
 	}
 
-    let images = $state([]);
+	let images: {
+		fileURL: string;
+		caption: string | null;
+	}[] = $state([]);
+	$inspect(images);
+
+	let caption = $state('');
+	$inspect(caption);
+
+	// Client-side compression
+	function compressImage(file: File): Promise<Blob> {
+		return new Promise((resolve, reject) => {
+			new Compressor(file, {
+				quality: 0.7, // 70% compression
+				convertSize: 1000000, // Convert PNG/JPEG over 1MB
+				success(result) {
+					resolve(result);
+				},
+				error(err) {
+					reject(err);
+				}
+			});
+		});
+	}
+
+	// Submit handler
+	async function submitHandler() {
+		if (images.length === 0 || caption.trim() === '') {
+			toast.error('Please add at least one image and a caption.');
+			return;
+		}
+		// Compress the images
+		let compPromises = images.map(async (image) => {
+			const file = await fetch(image.fileURL).then((res) => res.blob());
+			return compressImage(new File([file], image.fileURL.split('/').pop()!, { type: file.type }));
+		});
+		let compressedImages: Blob[] | undefined;
+		toast.promise(
+			async () => {
+				compressedImages = await Promise.all(compPromises);
+			},
+			{
+				loading: 'Compressing images...',
+				success: 'Images compressed successfully!',
+				error: 'An error occurred while compressing the images. Please try again.'
+			}
+		);
+
+		if (!compressedImages) {
+			return;
+		}
+
+		// Get presigned URLs
+	}
 </script>
 
 <Tabs.Root class="w-full" value={tabStage} disabled controlledValue>
@@ -30,10 +84,10 @@
 		>
 	</Tabs.List>
 	<Tabs.Content value="upload">
-        <PostImages bind:images />
+		<PostImages bind:images />
 		<Dialog.Footer class="gap-2 max-md:mt-2">
 			<Button
-				disabled={isProcessing}
+				disabled={isProcessing || images.length === 0}
 				type="submit"
 				onclick={async (e) => {
 					e.preventDefault();
@@ -41,8 +95,9 @@
 				}}>Add post details</Button
 			>
 		</Dialog.Footer>
-    </Tabs.Content>
+	</Tabs.Content>
 	<Tabs.Content value="finish-up">
+		<PostPreview bind:images bind:caption />
 		<Dialog.Footer class="gap-2 max-md:mt-2">
 			<Button
 				disabled={isProcessing}
@@ -52,7 +107,7 @@
 				}}>Change Image</Button
 			>
 			<Button
-				disabled={isProcessing}
+				disabled={isProcessing || images.length === 0 || caption.trim() === ''}
 				type="submit"
 				onclick={async (e) => {
 					e.preventDefault();
