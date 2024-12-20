@@ -15,7 +15,7 @@
 	let isProcessing = $state(false);
 
 	function getUploadFinalURL(fileName: string): string {
-		return PUBLIC_R2_URL + '/profile-picture/' + fileName;
+		return PUBLIC_R2_URL + '/post-image/' + fileName;
 	}
 
 	let images: {
@@ -25,7 +25,7 @@
 	$inspect(images);
 
 	let caption = $state('');
-	$inspect(caption);
+	let isPrivate = $state(false);
 
 	// Client-side compression
 	function compressImage(file: File): Promise<Blob> {
@@ -54,23 +54,110 @@
 			const file = await fetch(image.fileURL).then((res) => res.blob());
 			return compressImage(new File([file], image.fileURL.split('/').pop()!, { type: file.type }));
 		});
-		let compressedImages: Blob[] | undefined;
-		toast.promise(
-			async () => {
-				compressedImages = await Promise.all(compPromises);
-			},
-			{
-				loading: 'Compressing images...',
-				success: 'Images compressed successfully!',
-				error: 'An error occurred while compressing the images. Please try again.'
-			}
-		);
+		let compressedImages = await Promise.all(compPromises);
 
 		if (!compressedImages) {
+			toast.error('An error occurred while compressing the images. Please try again.');
 			return;
 		}
 
-		// Get presigned URLs
+		// Make a GET call to /api/upload/images?uploadType=post-image?count=<count> to get presigned URLs
+		let uploadUrls: string[] = [];
+		let fileNames: string[] = [];
+		const fetchUrl = `/api/upload/images?uploadType=post-image&count=${compressedImages!.length}`;
+		try {
+			const { urls, fileNames: fNames } = (
+				(await (
+					await fetch(fetchUrl, {
+						method: 'GET',
+						headers: {
+							'Content-Type': 'application/json'
+						}
+					})
+				).json()) as {
+					urls: ImageUploadType[];
+				}
+			).urls.reduce(
+				(acc, { fileName, url }) => {
+					acc.urls.push(url);
+					acc.fileNames.push(fileName);
+					return acc;
+				},
+				{ urls: [] as string[], fileNames: [] as string[] }
+			);
+			uploadUrls = urls;
+			fileNames = fNames;
+		} catch (error) {
+			toast.error('An error occurred while getting the presigned URLs. Please try again.');
+			return;
+		}
+
+		if (uploadUrls.length === 0) {
+			toast.error('An error occurred while getting the presigned URLs. Please try again.');
+			return;
+		}
+		if (uploadUrls.length !== compressedImages.length) {
+			toast.error(
+				'The number of presigned URLs does not match the number of images. Please try again.'
+			);
+			return;
+		}
+		// Make a PUT calls to the presigned URLs to upload the images
+		try {
+			await Promise.all(
+				compressedImages!.map(async (image, index) => {
+					const response = await fetch(uploadUrls[index], {
+						method: 'PUT',
+						body: image
+					});
+					if (!response.ok) {
+						throw new Error('An error occurred while uploading the image. Please try again.');
+					}
+				})
+			);
+		} catch (error) {
+			if (error instanceof Error) {
+				toast.error(error.message);
+				return;
+			}
+			toast.error('An error occurred while uploading the images. Please try again.');
+			return;
+		}
+		if (fileNames.length === 0) {
+			toast.error('An error occurred while uploading the images. Please try again.');
+			return;
+		}
+		// Hit POST /api/posts with JSON imageUrls = getUploadFinalURL(fileNames), caption, isPrivate
+		try {
+			const response = await fetch('/api/posts', {
+				method: 'POST',
+				headers: {
+					'Content-Type': 'application/json'
+				},
+				body: JSON.stringify({
+					images: fileNames.map((el)=>({
+						url: getUploadFinalURL(el),
+						caption: images.find((img) => img.fileURL === el)?.caption || null
+					})) as {
+						url: string;
+						caption: string | null;
+					}[],
+					caption,
+					isPrivate
+				})
+			});
+			if (!response.ok) {
+				throw new Error('An error occurred while creating the post. Please try again.');
+			}
+		} catch (error) {
+			if (error instanceof Error) {
+				toast.error(error.message);
+				return;
+			}
+			toast.error('An error occurred while creating the post. Please try again.');
+			return;
+		}
+		invalidateAll();
 	}
 </script>
 
@@ -97,7 +184,7 @@
 		</Dialog.Footer>
 	</Tabs.Content>
 	<Tabs.Content value="finish-up">
-		<PostPreview bind:images bind:caption />
+		<PostPreview bind:images bind:caption bind:isPrivate />
 		<Dialog.Footer class="gap-2 max-md:mt-2">
 			<Button
 				disabled={isProcessing}
@@ -112,6 +199,7 @@
 				onclick={async (e) => {
 					e.preventDefault();
 					isProcessing = true;
+					await submitHandler();
 					isProcessing = false;
 				}}>Save changes</Button
 			>

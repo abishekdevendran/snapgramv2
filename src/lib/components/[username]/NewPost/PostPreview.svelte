@@ -2,15 +2,18 @@
 	import * as Carousel from '$lib/components/ui/carousel/index.js';
 	import { Input } from '$lib/components/ui/input';
 	import { Label } from '$lib/components/ui/label';
+	import { Switch } from "$lib/components/ui/switch/index.js";
 	let {
 		images = $bindable(),
-		caption = $bindable()
+		caption = $bindable(),
+		isPrivate = $bindable(),
 	}: {
 		images: {
 			fileURL: string;
 			caption: string | null;
 		}[];
 		caption: string;
+		isPrivate: boolean;
 	} = $props();
 </script>
 
@@ -38,5 +41,9 @@
 	<form class="flex w-full flex-col justify-center gap-2">
 		<Label for="caption">Post Caption</Label>
 		<Input type="text" id="caption" bind:value={caption} class="w-full" />
+		<div class="flex items-center justify-between">
+			<Label for="isPrivate">Private Post</Label>
+			<Switch id="isPrivate" bind:checked={isPrivate} />
+		</div>
 	</form>
 </div>
