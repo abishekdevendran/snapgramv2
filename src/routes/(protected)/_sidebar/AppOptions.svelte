@@ -2,6 +2,7 @@
 	import * as Sidebar from '$lib/components/ui/sidebar';
 	import { LayoutDashboard, MessagesSquare, SquarePlus } from 'lucide-svelte';
 	import { goto, beforeNavigate, afterNavigate } from '$app/navigation';
+	import CreatePost from '$lib/components/[username]/CreatePost.svelte';
 
 	let isNavigating = $state(false);
 	beforeNavigate(() => {
@@ -16,13 +17,7 @@
 	<Sidebar.GroupLabel>Data management</Sidebar.GroupLabel>
 	<Sidebar.Menu>
 		<Sidebar.MenuItem>
-			<Sidebar.MenuButton
-				onclick={(e) => goto('/app')}
-				class={`${isNavigating ? 'cursor-default opacity-50' : ''}`}
-			>
-				<SquarePlus />
-				<span>{'New Post'}</span>
-			</Sidebar.MenuButton>
+			<CreatePost />
 		</Sidebar.MenuItem>
 	</Sidebar.Menu>
 </Sidebar.Group>

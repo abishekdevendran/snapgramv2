@@ -1,17 +1,8 @@
 <script lang="ts">
 	import * as Dialog from '$lib/components/ui/dialog/index.js';
-	import { Avatar, AvatarImage, AvatarFallback } from '$lib/components/ui/avatar';
 	import SquarePlus from 'lucide-svelte/icons/square-plus';
 	import DialogContent from './NewPost/DialogContent.svelte';
-	import { Button } from '../ui/button';
-
-	let {
-		src,
-		name
-	}: {
-		src: string | null;
-		name: string | null;
-	} = $props();
+	import * as Sidebar from '$lib/components/ui/sidebar';
 
 	let dialogOpen = $state(false);
 </script>
@@ -19,9 +10,10 @@
 <Dialog.Root bind:open={dialogOpen}>
 	<Dialog.Trigger class="group overflow-clip">
 		{#snippet child({ props })}
-			<Button variant="outline" size="icon" {...props}>
-				<SquarePlus size={12} class="h-[1.2rem] w-[1.2rem] rotate-0 scale-100 transition-all" />
-			</Button>
+			<Sidebar.MenuButton {...props}>
+				<SquarePlus />
+				<span>{'New Post'}</span>
+			</Sidebar.MenuButton>
 		{/snippet}
 	</Dialog.Trigger>
 	<Dialog.Content>
