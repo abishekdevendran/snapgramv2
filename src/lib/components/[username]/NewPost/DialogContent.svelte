@@ -6,13 +6,22 @@
 	import { toast } from 'svelte-sonner';
 	import type { ImageUploadType } from '../../../../routes/api/upload/images/+server';
 	import { PUBLIC_R2_URL } from '$env/static/public';
-	import { page } from '$app/stores';
+	import { page } from '$app/state';
 	import { invalidateAll } from '$app/navigation';
 	import PostImages from './PostImages.svelte';
 	import PostPreview from './PostPreview.svelte';
+	import { useQueryClient } from '@tanstack/svelte-query';
+
+	const queryClient = useQueryClient();
 
 	let tabStage = $state<'upload' | 'finish-up'>('upload');
 	let isProcessing = $state(false);
+
+	let {
+		dialogOpen = $bindable()
+	}: {
+		dialogOpen: boolean;
+	} = $props();
 
 	function getUploadFinalURL(fileName: string): string {
 		return PUBLIC_R2_URL + '/post-image/' + fileName;
@@ -135,7 +144,7 @@
 					'Content-Type': 'application/json'
 				},
 				body: JSON.stringify({
-					images: fileNames.map((el)=>({
+					images: fileNames.map((el) => ({
 						url: getUploadFinalURL(el),
 						caption: images.find((img) => img.fileURL === el)?.caption || null
 					})) as {
@@ -158,6 +167,11 @@
 			return;
 		}
 		invalidateAll();
+		await queryClient.invalidateQueries({
+			queryKey: ['posts'],
+			exact: true,
+			refetchType: 'active'
+		});
 	}
 </script>
 
@@ -201,6 +215,7 @@
 					isProcessing = true;
 					await submitHandler();
 					isProcessing = false;
+					dialogOpen = false;
 				}}>Save changes</Button
 			>
 		</Dialog.Footer>

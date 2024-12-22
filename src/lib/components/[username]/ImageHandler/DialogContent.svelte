@@ -8,7 +8,7 @@
 	import { toast } from 'svelte-sonner';
 	import type { ImageUploadType } from '../../../../routes/api/upload/images/+server';
 	import { PUBLIC_R2_URL } from '$env/static/public';
-	import { page } from '$app/stores';
+	import { page } from '$app/state';
 	import { invalidateAll } from '$app/navigation';
 
 	let tabStage = $state<'upload' | 'edit'>('upload');
@@ -95,7 +95,7 @@
 		try {
 			const formData = new FormData();
 			formData.append('profilePictureUrl', getPfPFinalURL(fileName));
-			const response = await fetch(`/${$page.data.user.username}?/patchUser`, {
+			const response = await fetch(`/${page.data.user.username}?/patchUser`, {
 				method: 'POST',
 				body: formData
 			});

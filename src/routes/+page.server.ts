@@ -5,6 +5,8 @@ import { deleteSessionTokenCookie, invalidateSession } from '$lib/server/auth';
 export const load: PageServerLoad = async (event) => {
 	if (event.locals.user) {
 		return redirect(302, '/dashboard');
+	} else{
+		return redirect(302, '/login');
 	}
 };
 

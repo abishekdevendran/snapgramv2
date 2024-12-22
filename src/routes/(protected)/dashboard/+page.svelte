@@ -2,10 +2,10 @@
 	import { goto, replaceState } from '$app/navigation';
 	import { onMount } from 'svelte';
 	import { toast } from 'svelte-sonner';
-	import { page } from '$app/stores';
+	import { page } from '$app/state';
 	// on mount, check if any errors are in the URL and toast
-	onMount(() => {
-		const urlParams = $page.url.searchParams;
+	$effect(() => {
+		const urlParams = page.url.searchParams;
 		const error = urlParams.get('error');
 		if (error) {
 			toast.error(error);

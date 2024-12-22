@@ -1,43 +1,30 @@
 <script lang="ts">
+	import { applyAction, enhance } from '$app/forms';
+
+	import LogOut from 'lucide-svelte/icons/log-out';
 	import { toast } from 'svelte-sonner';
-	import { enhance } from '$app/forms';
 </script>
 
 <form
 	method="post"
-	action="/?/logout"
-	use:enhance={() => {
-		let promiseCallbacks: { resolve: any; reject: any };
-		const toastPromise = new Promise((resolve, reject) => {
-			promiseCallbacks = { resolve, reject };
-		});
-
-		// Show the toast immediately
-		toast.promise(toastPromise, {
-			loading: 'Logging out...',
-			success: 'Logged out successfully!',
-			error: (e) => `Error: ${e}`
-		});
-
-		// Return the callback that will handle the form submission result
+	use:enhance={({}) => {
 		return async ({ result, update }) => {
-			console.log('Action result: ', result);
-			switch (result.status) {
-				case 200:
-				case 302:
-					promiseCallbacks.resolve('Logged out successfully!');
-					break;
-				case 401:
-					promiseCallbacks.reject('Unauthorized');
-					break;
-				default:
-					promiseCallbacks.reject('Unknown error');
-					break;
+			// Handle failure and success conditions
+			if (result.type === 'failure') {
+				if (typeof result.data?.message === 'string') {
+					toast.error(result.data?.message || 'Something went wrong');
+				}
+			} else if (result.type === 'success' || result.type === 'redirect') {
+				toast.success('Logged out successfully!');
+				applyAction(result);
 			}
-			update();
 		};
 	}}
-	class="h-full w-full"
+	action="/?/logout"
+	class="items flex w-full pl-1"
 >
-	<button type="submit" class="h-full w-full p-2">Sign out</button>
+	<button class="flex w-full items-center gap-2">
+		<LogOut size={15} />
+		Logout
+	</button>
 </form>

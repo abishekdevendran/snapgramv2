@@ -1,7 +1,7 @@
 <script lang="ts">
 	import '../app.css';
 	import { QueryClientProvider } from '@tanstack/svelte-query';
-	import { page } from '$app/stores';
+	import { page } from '$app/state';
 	import NavBar from '$lib/components/NavBar.svelte';
 	import { Toaster } from '$lib/components/ui/sonner';
 	import { ModeWatcher } from 'mode-watcher';
@@ -21,8 +21,8 @@
 	const APP_NAME = 'SnapGram';
 	// construct the title
 	let title = $derived(
-		$page.url.pathname.length > 1
-			? $page.url.pathname.split('/').filter(Boolean).join(' - ') + ' | ' + APP_NAME
+		page.url.pathname.length > 1
+			? page.url.pathname.split('/').filter(Boolean).join(' - ') + ' | ' + APP_NAME
 			: APP_NAME
 	);
 </script>
@@ -31,11 +31,11 @@
 	<title>{title}</title>
 </svelte:head>
 <ModeWatcher />
-<Toaster richColors />
-<ProgressBar class="text-primary" zIndex={999} />
 <QueryClientProvider client={data.queryClient}>
+	<Toaster richColors />
+	<ProgressBar class="text-primary" zIndex={999} />
 	<main
-		class="font-poppins flex min-h-[100svh] w-full flex-col bg-muted/40 transition-all duration-300"
+		class="flex min-h-[100svh] w-full flex-col bg-muted/40 font-poppins transition-all duration-300"
 	>
 		{@render children()}
 	</main>

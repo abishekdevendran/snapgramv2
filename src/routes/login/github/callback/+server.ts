@@ -49,7 +49,8 @@ export async function GET(event: RequestEvent): Promise<Response> {
 		});
 	}
 	if (!githubUser.email) {
-		const githubUserEmailResponse = await fetch('https://api.github.com/users/emails', {
+		console.log('No email found, fetching emails');
+		const githubUserEmailResponse = await fetch('https://api.github.com/user/emails', {
 			headers: {
 				Authorization: `Bearer ${tokens.accessToken()}`,
 				'User-Agent': 'SnapGram',
@@ -60,6 +61,7 @@ export async function GET(event: RequestEvent): Promise<Response> {
 		let githubUserEmailResponseClone = githubUserEmailResponse.clone();
 		try {
 			githubUserEmail = await githubUserEmailResponse.json();
+			console.log('GHUB emails: ', githubUserEmail);
 		} catch (e) {
 			console.error('GHUB err: ', await githubUserEmailResponseClone.text());
 			return new Response(null, {

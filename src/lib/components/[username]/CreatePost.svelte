@@ -12,13 +12,17 @@
 		src: string | null;
 		name: string | null;
 	} = $props();
+
+	let dialogOpen = $state(false);
 </script>
 
-<Dialog.Root>
+<Dialog.Root bind:open={dialogOpen}>
 	<Dialog.Trigger class="group overflow-clip">
-		<Button variant="outline" size="icon">
-			<SquarePlus size={12} class="h-[1.2rem] w-[1.2rem] rotate-0 scale-100 transition-all" />
-		</Button>
+		{#snippet child({ props })}
+			<Button variant="outline" size="icon" {...props}>
+				<SquarePlus size={12} class="h-[1.2rem] w-[1.2rem] rotate-0 scale-100 transition-all" />
+			</Button>
+		{/snippet}
 	</Dialog.Trigger>
 	<Dialog.Content>
 		<Dialog.Header>
@@ -27,6 +31,6 @@
 				Select image(s) to upload. Add captions to your post and/or images.
 			</Dialog.Description>
 		</Dialog.Header>
-		<DialogContent />
+		<DialogContent bind:dialogOpen />
 	</Dialog.Content>
 </Dialog.Root>
