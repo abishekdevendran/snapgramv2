@@ -30,7 +30,7 @@ export const GET = async (event) => {
 	const posts = await full_posts_query.execute({
 		pc_user_id: event.locals.user.id
 	});
-	return json(posts);
+	return json(posts.filter((el) => el.images.length > 0));
 };
 
 const createPostEndpointSchema = z.object({

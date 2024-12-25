@@ -33,7 +33,7 @@
 >
 	<Image
 		layout="fullWidth"
-		src={post.images[0].url}
+		src={post.images[0]?.url}
 		alt="Post {post.id}"
 		class="aspect-square w-full object-cover transition-transform duration-300 group-hover:scale-110"
 		background={post.images[0]?.blurhash
